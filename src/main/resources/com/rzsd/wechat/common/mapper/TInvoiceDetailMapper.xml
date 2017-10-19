@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rzsd.wechat.common.mapper.TInvoiceDetailMapper">
+    <select id="select" parameterType="tInvoiceDetail" resultType="tInvoiceDetail">
+        select *
+        from t_invoice_detail
+        where
+        1=1
+        <if test="invoiceId != null">and invoice_id = #{invoiceId}</if>
+        <if test="rowNo != null">and row_no = #{rowNo}</if>
+        <if test="lotNo != null">and lot_no = #{lotNo}</if>
+        <if test="trackingNo != null">and tracking_no = #{trackingNo}</if>
+        <if test="weight != null">and weight = #{weight}</if>
+        <if test="status != null">and status = #{status}</if>
+        <if test="delFlg != null">and del_flg = #{delFlg}</if>
+        <if test="createTime != null">and create_time = #{createTime}</if>
+        <if test="createId != null">and create_id = #{createId}</if>
+        <if test="updateTime != null">and update_time = #{updateTime}</if>
+        <if test="updateId != null">and update_id = #{updateId}</if>
+        <if test="orderByStr != null">ORDER BY ${orderByStr}</if>
+        <if test="limitCnt != null">
+            limit ${limitCnt}
+            <if test="offsetRowNum != null">offset ${offsetRowNum}</if>
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="tInvoiceDetail">
+        INSERT
+        INTO t_invoice_detail(
+        invoice_id
+        <if test="rowNo != null">, row_no</if>
+        <if test="lotNo != null">, lot_no</if>
+        <if test="trackingNo != null">, tracking_no</if>
+        <if test="weight != null">, weight</if>
+        <if test="status != null">, status</if>
+        <if test="delFlg != null">, del_flg</if>
+        <if test="createTime != null">, create_time</if>
+        <if test="createId != null">, create_id</if>
+        <if test="updateTime != null">, update_time</if>
+        <if test="updateId != null">, update_id</if>
+        )
+        VALUES (
+        #{invoiceId}
+        <if test="rowNo != null">, #{rowNo}</if>
+        <if test="lotNo != null">, #{lotNo}</if>
+        <if test="trackingNo != null">, #{trackingNo}</if>
+        <if test="weight != null">, #{weight}</if>
+        <if test="status != null">, #{status}</if>
+        <if test="delFlg != null">, #{delFlg}</if>
+        <if test="createTime != null">, #{createTime}</if>
+        <if test="createId != null">, #{createId}</if>
+        <if test="updateTime != null">, #{updateTime}</if>
+        <if test="updateId != null">, #{updateId}</if>
+        )
+    </insert>
+
+
+    <update id="update" parameterType="tInvoiceDetail">
+        UPDATE t_invoice_detail
+        SET
+        invoice_id = #{invoiceId}
+        <if test="rowNo != null">, row_no = #{rowNo}</if>
+        <if test="lotNo != null">, lot_no = #{lotNo}</if>
+        <if test="trackingNo != null">, tracking_no = #{trackingNo}</if>
+        <if test="weight != null">, weight = #{weight}</if>
+        <if test="status != null">, status = #{status}</if>
+        <if test="delFlg != null">, del_flg = #{delFlg}</if>
+        <if test="createTime != null">, create_time = #{createTime}</if>
+        <if test="createId != null">, create_id = #{createId}</if>
+        <if test="updateTime != null">, update_time = #{updateTime}</if>
+        <if test="updateId != null">, update_id = #{updateId}</if>
+        WHERE
+        1=1
+        and invoice_id = #{invoiceId}
+        <if test="rowNo != null">and row_no = #{rowNo}</if>
+    </update>
+
+</mapper>

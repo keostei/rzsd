@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rzsd.wechat.common.mapper.MUserMapper">
+
+    <select id="select" parameterType="mUser" resultType="mUser">
+        select *
+        from m_user
+        where
+        1=1
+        <if test="id != null">and id = #{id}</if>
+        <if test="userName != null">and user_name = #{userName}</if>
+        <if test="password != null">and password = #{password}</if>
+        <if test="nickName != null">and nick_name = #{nickName}</if>
+        <if test="wechatOpenId != null">and wechat_open_id = #{wechatOpenId}</if>
+        <if test="customId != null">and custom_id = #{customId}</if>
+        <if test="userType != null">and user_type = #{userType}</if>
+        <if test="totalWeight != null">and total_weight = #{totalWeight}</if>
+        <if test="userLever != null">and user_lever = #{userLever}</if>
+        <if test="delFlg != null">and del_flg = #{delFlg}</if>
+        <if test="createTime != null">and create_time = #{createTime}</if>
+        <if test="createId != null">and create_id = #{createId}</if>
+        <if test="updateTime != null">and update_time = #{updateTime}</if>
+        <if test="updateId != null">and update_id = #{updateId}</if>
+        <if test="orderByStr != null">ORDER BY ${orderByStr}</if>
+        <if test="limitCnt != null">
+            limit ${limitCnt}
+            <if test="offsetRowNum != null">offset ${offsetRowNum}</if>
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="mUser">
+        INSERT
+        INTO m_user(
+        user_name
+        <if test="password != null">, password</if>
+        <if test="nickName != null">, nick_name</if>
+        <if test="wechatOpenId != null">, wechat_open_id</if>
+        <if test="customId != null">, custom_id</if>
+        <if test="userType != null">, user_type</if>
+        <if test="totalWeight != null">, total_weight</if>
+        <if test="userLever != null">, user_lever</if>
+        <if test="delFlg != null">, del_flg</if>
+        <if test="createId != null">, create_id</if>
+        <if test="updateId != null">, update_id</if>
+        )
+        VALUES (
+        #{userName}
+        <if test="password != null">, #{password}</if>
+        <if test="nickName != null">, #{nickName}</if>
+        <if test="wechatOpenId != null">, #{wechatOpenId}</if>
+        <if test="customId != null">, #{customId}</if>
+        <if test="userType != null">, #{userType}</if>
+        <if test="totalWeight != null">, #{totalWeight}</if>
+        <if test="userLever != null">, #{userLever}</if>
+        <if test="delFlg != null">, #{delFlg}</if>
+        <if test="createId != null">, #{createId}</if>
+        <if test="updateId != null">, #{updateId}</if>
+        )
+    </insert>
+
+
+    <update id="update" parameterType="mUser">
+        UPDATE m_user
+        SET
+        id = #{id}
+        <if test="userName != null">, user_name = #{userName}</if>
+        <if test="password != null">, password = #{password}</if>
+        <if test="nickName != null">, nick_name = #{nickName}</if>
+        <if test="wechatOpenId != null">, wechat_open_id = #{wechatOpenId}</if>
+        <if test="customId != null">, custom_id = #{customId}</if>
+        <if test="userType != null">, user_type = #{userType}</if>
+        <if test="totalWeight != null">, total_weight = #{totalWeight}</if>
+        <if test="userLever != null">, user_lever = #{userLever}</if>
+        <if test="delFlg != null">, del_flg = #{delFlg}</if>
+        <if test="createTime != null">, create_time = #{createTime}</if>
+        <if test="createId != null">, create_id = #{createId}</if>
+        <if test="updateTime != null">, update_time = #{updateTime}</if>
+        <if test="updateId != null">, update_id = #{updateId}</if>
+        WHERE
+        1=1
+        and id = #{id}
+    </update>
+</mapper>

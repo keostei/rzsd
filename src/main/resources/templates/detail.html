@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!-- saved from url=(0056)http://www.jpshpn.com/Home/ShopAct/index/c_id/17/s_id/18 -->
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>日中快递详细查询</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/jquery.fileupload.css" />
+
+    <script src="js/jquery-1.8.3.min.js"></script>
+    <script src="js/layer.js"></script>
+    <link rel="stylesheet" href="css/layer.css" id="layuicss-skinlayercss" />
+    <script src="js/load-image.all.min.js"></script>
+    <script src="js/canvas-to-blob.min.js"></script>
+    <script src="js/jquery.ui.widget.js"></script>
+    <script src="js/jquery.fileupload.js"></script>
+    <script src="js/jquery.fileupload-process.js"></script>
+    <script src="js/jquery.fileupload-image.js"></script>
+    <script src="js/jquery.fileupload-validate.js"></script>
+</head>
+    <body>
+	    <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="tab-content from_box mar_b50 clearfix" >
+                        <div role="tabpanel" class="tab-pane" id="home"></div>
+                        <div role="tabpanel" class="tab-pane active" id="activy">
+                            <div class="from_box_tit clearfix">
+                                <h4>日中快递详细查询</h4>
+                            </div>
+                            <div class="panel panel-success">
+                                <div class="panel-heading" th:text="${invoice.invoiceStatusName}">打包完成</div>
+                                <div class="panel-body">
+                                    <p><span th:text="${'取件日期: ' + #calendars.format(invoice.invoiceDate, 'yyyy-MM-dd')}">取件日期: 2017-10-02</span></p>
+                                    <p><span th:text="${'客户编码: ' + invoice.customCd}">客户编码: AOKNS-01</span></p>
+                                    <p><span th:text="${'收件人: ' + invoice.name}">收件人: 李四</span></p>
+                                    <p><span th:text="${'地址: ' + invoice.address}">收件人地址: 江苏省苏州市新区姑苏路27弄12号</span></p>
+                                    <p><span th:text="${invoice.totalWeight == 0}?'包裹重量：- KG': '包裹重量：' + ${invoice.totalWeight} + ' KG'">包裹重量: 75KG</span></p>
+                                    <p><span th:text="${invoice.invoiceAmountJpy == 0}?'运费合计：- JPY': '运费合计：' + ${#numbers.formatDecimal(invoice.invoiceAmountJpy,3,0,'COMMA')} + ' JPY'">运费合计：-JPY</span>
+                                        <span th:text="${invoice.invoiceAmountCny == 0}?'- CNY': ${#numbers.formatDecimal(invoice.invoiceAmountCny,3,0,'COMMA')} + ' RMB'">-RMB</span>
+                                    </p>
+                                    <p><span th:text="${'备注信息：' + invoice.invoiceRequirement}">备注信息: </span></p>
+                                </div>
+                            </div>
+                            <div class="panel panel-success" th:each="invoiceDetail,iterStat:${invoiceDetailList}">
+                                <div class="panel-heading" th:text="${invoiceDetail.trackingNo}">EMS12345678</div>
+                                <div class="panel-body">
+                                    <p><span th:text="${'当前状态：' + invoiceDetail.statusName}">当前状态: 国内清关完成</span></p>
+                                    <p><span th:text="${'包裹编号：' + invoiceDetail.lotNo}">包裹编号: RZ-A-01</span></p>
+                                    <p><span th:text="${invoiceDetail.weight == 0}?'包裹重量：- KG': '包裹重量：' + ${invoiceDetail.weight} + ' KG'">包裹重量: 18.70KG</span></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">友情提示</label>
+                                <p>1.打包完成后会生成国内物流编号，但在国内清关完成前无法查询到物流信息。 </p>
+                                <p>2.包裹编号为日中快递查询物流批次的唯一信息，如果发现有问题请将此编号告知我司工作人员辅助查询。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

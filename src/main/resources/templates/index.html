@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<!-- saved from url=(0056)http://www.jpshpn.com/Home/ShopAct/index/c_id/17/s_id/18 -->
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>日中速递</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+        <link rel="stylesheet" href="css/bootstrap.min.css" />
+        <link rel="stylesheet" href="css/common.css" />
+        <link rel="stylesheet" href="css/jquery.fileupload.css" />
+        <link rel="stylesheet" href="css/bootstrap-select.min.css" />
+        <script src="js/jquery-2.1.1.min.js"></script>
+        <script src="js/load-image.all.min.js"></script>
+        <script src="js/canvas-to-blob.min.js"></script>
+        <script src="js/jquery.ui.widget.js"></script>
+        <script src="js/jquery.fileupload.js"></script>
+        <script src="js/jquery.fileupload-process.js"></script>
+        <script src="js/jquery.fileupload-image.js"></script>
+        <script src="js/jquery.fileupload-validate.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script type="text/ecmascript" src="js/bootstrap-select.min.js"></script>
+        <script type="text/ecmascript" src="js/common.js"></script>
+        <script type="text/ecmascript" src="js/common.js"></script>
+        <script type="text/ecmascript" src="js/index.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <ul class="nav nav-tabs mar_t20" role="tablist">
+                        <li role="presentation" ><a href="#yuyue" aria-controls="home" role="tab" data-toggle="tab">取件预约</a></li>
+                        <li role="presentation" class="active"><a href="#chaxun" aria-controls="profile" role="tab" data-toggle="tab">快递查询</a></li>
+                        <li role="presentation"><a href="#dizhi" aria-controls="profile" role="tab" data-toggle="tab">收件地址</a></li>
+                    </ul>
+                    <div class="tab-content from_box mar_b50 clearfix" >
+                        <div role="tabpanel" class="tab-pane " id="yuyue">
+                            <div class="from_box_tit clearfix">
+                                <h4>取件预约</h4>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">取件时间</label>
+                                <input type="date" name="consume_time" class="form-control" style="-webkit-appearance: none;line-height: 20px" />
+                                <select style="width: 100%;height: 34px;margin-top: 5px;">
+                                  <option value="volvo">12:00之前</option>
+                                  <option value="saab">12:00-15:00</option>
+                                  <option value="opel" selected="selected">15:00-18:00</option>
+                                  <option value="audi">18:00-21:00</option>
+                                  <option value="audi">21:00之后</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">取件地址</label>
+                                <input type="text" name="passport_no" class="form-control" placeholder="取件地址，请尽量填写详细。" style="text-transform : uppercase" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">取件估重</label>
+                                <input type="text" name="price" class="form-control" placeholder="估算取件的大致重量。单位：KG" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">客户编码</label>
+                                <select style="width: 100%;height: 34px;margin-top: 5px;">
+                                  <option value="opel" selected="selected">AOKNS-01(默认)</option>
+                                  <option value="audi">AOKNS-02</option>
+                                  <option value="audi">AOKNS-03</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" name="price" class="form-control" placeholder="国内收件人姓名" value="郑超" readonly="readonly" style="background-color:#fff;border:none;"/>
+                                <input type="text" name="price" class="form-control" placeholder="国内收件人联系电话，很重要" value="13951741096" readonly="readonly" style="background-color:#fff;border:none;"/>
+                                <textarea  rows="2" name="price" class="form-control" placeholder="国内收件人地址，很重要"  readonly="readonly" style="background-color:#fff;border:none;">江苏省南京市建邺区奥体大街69号新城科技园14楼</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">其他要求</label>
+                                <input type="text" name="odd_numbers" class="form-control" placeholder="其他要求" />
+                            </div>
+                            <div class="col-xs-12 mar_b20">
+                                <input type="submit" name="sub" class="btn btn-default col-xs-12" id="btnConfirm" value="确定预约" />
+                            </div>
+    
+                            <!--提示信息-->
+                            <div class="form-group">
+                                <label class="control-label">友情提示</label>
+                                <p>1.为确保我司取件工作人员能顺利取件，预约提交完成后，可直接与XXX或者YYY微信联系。 </p>
+                                <p>2.如果收件人地址为多个地址，请按照收件人地址为单位分开预约。 </p>
+                                <p>3.如果已经在本微信公众号绑定过国内收件人信息，预约时默认为绑定收件人信息，如发生变化请务必填写最新地址。 </p>
+                                <p>4.XXXXXXXXXXXX。 </p>
+                                <p>5.XXXXXXXXXXXX。 </p>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane active" id="chaxun">
+                            <div class="from_box_tit clearfix">
+                                <h4>快递查询</h4>
+                            </div>
+                            <div th:each="invoice,iterStat:${invoiceLst}" class="panel" 
+                                th:classappend="${invoice.invoiceStatus=='1'}?'panel-danger':'panel-success'"
+                                th:onclick="${'window.location.href=''detail?invoiceId=' + invoice.invoiceId + ''';'}">
+                                <div class="panel-heading" th:text="${invoice.invoiceStatusName}">已取件</div>
+                                <div class="panel-body">
+                                    <p><span th:text="${'取件日期: ' + #calendars.format(invoice.invoiceDate, 'yyyy-MM-dd')}">取件日期: 2017-10-02</span></p>
+                                    <p><span th:text="${'客户编码: ' + invoice.customCd}">客户编码: AOKNS-01</span></p>
+                                    <p><span th:text="${'收件人: ' + invoice.name}">收件人: 张三</span></p>
+                                    <p><span th:text="${'电话号码: ' + invoice.telNo}">电话号码: 13289029182</span></p>
+                                    <p><span th:text="${'地址: ' + invoice.address}">地址: 上海市闵行区七星镇新民路128号</span></p>
+                                    <p><span th:text="${invoice.totalWeight == 0}?'包裹重量：- KG': '包裹重量：' + ${invoice.totalWeight} + ' KG'">包裹重量: - KG</span></p>
+                                    <p><span th:text="${invoice.invoiceAmountJpy == 0}?'运费合计：- JPY': '运费合计：' + ${#numbers.formatDecimal(invoice.invoiceAmountJpy,3,0,'COMMA')} + ' JPY'">运费合计：-JPY</span>
+                                        <span th:text="${invoice.invoiceAmountCny == 0}?'- CNY': ${#numbers.formatDecimal(invoice.invoiceAmountCny,3,0,'COMMA')} + ' RMB'">-RMB</span>
+                                    </p>
+                                    <p><span th:text="${'备注信息：' + invoice.invoiceRequirement}">备注信息: </span></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">友情提示</label>
+                                <p>1.为确保我司取件工作人员能顺利取件，预约提交完成后，可直接与XXX或者YYY微信联系。 </p>
+                                <p>2.如果收件人地址为多个地址，请按照收件人地址为单位分开预约。 </p>
+                                <p>3.如果已经在本微信公众号绑定过国内收件人信息，预约时默认为绑定收件人信息，如发生变化请务必填写最新地址。 </p>
+                                <p>4.XXXXXXXXXXXX。 </p>
+                                <p>5.XXXXXXXXXXXX。 </p>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="dizhi">
+                            <div class="from_box_tit clearfix">
+                                <h4>收件地址</h4>
+                            </div>
+                            <div class="panel panel-success" th:each="customInfo,iterStat:${customInfoLst}" >
+                                <div class="panel-heading" th:text="${'客户编码：' + customInfo.customId + customInfo.rowNo}">客户编码：AOKNS-01（默认）</div>
+                                <div class="panel-body">
+	                                <div class="form-group rzsd-address">
+	                                    <label class="control-label">地址</label>
+	                                    <textarea rows="2" class="form-control" placeholder="填写收件详细地址" th:text="${customInfo.address}"></textarea>
+	                                </div>
+	                                <div class="form-group">
+	                                    <label class="control-label">收件人姓名</label>
+	                                    <input type="text" class="form-control" placeholder="国内收件人姓名" th:value="${customInfo.name}" />
+	                                </div>
+	                                <div class="form-group">
+	                                    <label class="control-label">收件人电话</label>
+	                                    <input type="text" class="form-control" placeholder="国内收件人联系电话，很重要" th:value="${customInfo.telNo}" />
+	                                </div>
+	                                <div class="col-xs-12 mar_b20">
+	                                    <input type="submit" name="sub" class="btn btn-default col-xs-12 save-adderss"  value="保存" />
+	                                    <input type="hidden" class="save-address-customid" th:value="${customInfo.customId}" />
+	                                    <input type="hidden" class="save-address-rowno" th:value="${customInfo.rowNo}" />
+	                                </div>
+                                </div>
+                            </div>
+                            <!--提示信息-->
+                            <div class="form-group">
+                                <label class="control-label">友情提示</label>
+                                <p>1.为了更方便的预约取件，请填写本页面的地址信息。 </p>
+                                <p>2.本页面将保存默认收件人信息地址，今后物流地址如果发生变化时请记得及时修改。 </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
