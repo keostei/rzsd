@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.rzsd.wechat.common.dto.InvoiceData;
 import com.rzsd.wechat.common.dto.TInvoice;
 import com.rzsd.wechat.common.dto.TInvoiceDetail;
 import com.rzsd.wechat.entity.InvoiceDeliver;
@@ -25,4 +26,8 @@ public interface InvoiceService {
     List<TInvoice> getInvoiceOutputInfo(HttpServletRequest request);
 
     List<InvoiceDeliver> importInvoiceData(final List<InvoiceDeliver> invoiceDeliverLst, HttpServletRequest request);
+
+    List<InvoiceData> searchInvoiceData(InvoiceData invoiceDataCond);
+
+    int editInvoiceData(InvoiceData invoiceDataCond, HttpServletRequest request);
 }

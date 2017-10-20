@@ -14,6 +14,7 @@ import com.rzsd.wechat.common.dto.TInvoice;
 import com.rzsd.wechat.service.InvoiceService;
 import com.rzsd.wechat.service.SystemService;
 import com.rzsd.wechat.service.UserService;
+import com.rzsd.wechat.util.DateUtil;
 
 @Controller
 @RequestMapping("/")
@@ -80,6 +81,16 @@ public class WebController {
     public String initConfirm(Model model, HttpServletRequest request) {
         model.addAttribute("invoiceLst", invoiceServiceImpl.getConfirmLst());
         return "confirm";
+    }
+
+    @RequestMapping(value = "data")
+    @WebAuth
+    public String initData(Model model, HttpServletRequest request) {
+        System.out.println(request.getHeader("USER-AGENT"));
+        model.addAttribute("condInvoiceDateFrom",
+                DateUtil.format(DateUtil.addDays(DateUtil.getCurrentTimestamp(), -14)));
+        model.addAttribute("condInvoiceDateTo", DateUtil.format(DateUtil.getCurrentTimestamp()));
+        return "data";
     }
 
     @RequestMapping(value = "system")

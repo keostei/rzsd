@@ -365,3 +365,9 @@ body > #wrap {
 th {
 	text-align:center;
 }
+
+td {
+    border-left-color:#aed2d9;
+    border-left-style:dashed;
+    border-width:1px;
+}

@@ -116,4 +116,40 @@
         AND A.del_flg = '0' 
         ORDER BY A.invoice_date DESC
     </select>
+
+    <select id="getInvoiceData" parameterType="invoiceData" resultType="invoiceData">
+        select A.invoice_id
+            , DATE_FORMAT(A.invoice_date, '%Y-%m-%d') as invoice_date
+            , A.custom_cd
+            , A.name
+            , A.address
+            , A.invoice_status
+            , A.total_weight
+            , A.invoice_amount_jpy
+            , B.lot_no
+            , B.tracking_no
+            , B.weight 
+         from t_invoice A 
+        LEFT JOIN t_invoice_detail B 
+          ON A.invoice_id = B.invoice_id 
+         <where>
+            A.del_flg = '0' 
+            <if test="condCustomCd != null and condCustomCd != ''">
+                AND A.custom_cd like LIKE concat(concat('%',#{condCustomCd}),'%')
+            </if>
+            <if test="condName != null and condName != ''">
+                AND A.name like LIKE concat(concat('%',#{condName}),'%')
+            </if>
+            <if test="condInvoiceStatus != null and condInvoiceStatus != ''">
+                AND A.invoice_status = #{condInvoiceStatus}
+            </if>
+            <if test="condInvoiceDateFrom != null and condInvoiceDateFrom != ''">
+                AND A.invoice_date >= str_to_date(#{condInvoiceDateFrom}, '%Y-%m-%d')
+            </if>
+            <if test="condInvoiceDateTo != null and condInvoiceDateTo != ''">
+                AND A.invoice_date <![CDATA[<=]]> str_to_date(#{condInvoiceDateTo}, '%Y-%m-%d')
+            </if>
+         </where>
+         order by A.invoice_id, B.row_no 
+    </select>
 </mapper>

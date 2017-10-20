@@ -16,6 +16,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rzsd.wechat.annotation.WebAuth;
 import com.rzsd.wechat.common.dto.BaseJsonDto;
+import com.rzsd.wechat.common.dto.InvoiceData;
 import com.rzsd.wechat.common.dto.MCustomInfo;
 import com.rzsd.wechat.common.dto.TInvoice;
 import com.rzsd.wechat.entity.InvoiceDeliver;
@@ -116,7 +118,7 @@ public class RestFullController {
     @WebAuth(lever = { "3" })
     public BaseJsonDto importData(HttpServletRequest request, HttpServletResponse response) throws IOException {
         BaseJsonDto result = new BaseJsonDto();
-        XSSFWorkbook xssfWorkbook = ExcelReaderUtil.getBook("D:\\var\\RZSD-TEMPLATE.xlsx");
+        XSSFWorkbook xssfWorkbook = ExcelReaderUtil.getBook("/opt/rzsd/RZSD-TEMPLATE.xlsx");
         XSSFSheet sheet = xssfWorkbook.getSheet("TEMPLATE");
         XSSFRow row = null;
         int rowNum = 2;
@@ -148,13 +150,63 @@ public class RestFullController {
         return result;
     }
 
+    @RequestMapping("/system/search_data")
+    @WebAuth(lever = { "3" })
+    public List<InvoiceData> searchData(HttpServletRequest request, HttpServletResponse response) {
+        String condCustomCd = request.getParameter("condCustomCd");
+        String condName = request.getParameter("condName");
+        String condInvoiceStatus = request.getParameter("condInvoiceStatus");
+        String condInvoiceDateFrom = request.getParameter("condInvoiceDateFrom");
+        String condInvoiceDateTo = request.getParameter("condInvoiceDateTo");
+        InvoiceData invoiceDataCond = new InvoiceData();
+        invoiceDataCond.setCondCustomCd(condCustomCd);
+        invoiceDataCond.setCondName(condName);
+        invoiceDataCond.setCondInvoiceStatus(condInvoiceStatus);
+        invoiceDataCond.setCondInvoiceDateFrom(condInvoiceDateFrom);
+        invoiceDataCond.setCondInvoiceDateTo(condInvoiceDateTo);
+        List<InvoiceData> lst = invoiceServiceImpl.searchInvoiceData(invoiceDataCond);
+        return lst;
+    }
+
+    @RequestMapping("/system/edit_data")
+    @WebAuth(lever = { "3" })
+    public BaseJsonDto editData(HttpServletRequest request, HttpServletResponse response) {
+        String invoiceId = request.getParameter("invoiceId");
+        String customCd = request.getParameter("customCd");
+        String name = request.getParameter("name");
+        String address = request.getParameter("address");
+        String invoiceStatus = request.getParameter("invoiceStatus");
+        String totalWeight = request.getParameter("totalWeight");
+        String invoiceAmountJpy = request.getParameter("invoiceAmountJpy");
+        String dispLotNo = request.getParameter("dispLotNo");
+        String dispTrackingNo = request.getParameter("dispTrackingNo");
+        String dispWeight = request.getParameter("dispWeight");
+        InvoiceData invoiceDataCond = new InvoiceData();
+        invoiceDataCond.setInvoiceId(invoiceId);
+        invoiceDataCond.setCustomCd(customCd);
+        invoiceDataCond.setName(name);
+        invoiceDataCond.setAddress(address);
+        invoiceDataCond.setInvoiceStatus(invoiceStatus);
+        if (!StringUtils.isEmpty(totalWeight)) {
+            invoiceDataCond.setTotalWeight(new BigDecimal(totalWeight));
+        }
+        invoiceDataCond.setInvoiceAmountJpy(invoiceAmountJpy);
+        invoiceDataCond.setDispLotNo(dispLotNo);
+        invoiceDataCond.setDispTrackingNo(dispTrackingNo);
+        invoiceDataCond.setDispWeight(dispWeight);
+        invoiceServiceImpl.editInvoiceData(invoiceDataCond, request);
+        BaseJsonDto result = new BaseJsonDto();
+        result.setFail(false);
+        return result;
+    }
+
     @RequestMapping("download_invoice_output")
     @WebAuth(lever = { "3" })
     public BaseJsonDto downLoadInvoiceOutput(Model model, HttpServletRequest request, HttpServletResponse response)
             throws UnsupportedEncodingException, IOException {
 
         List<TInvoice> invoiceLst = invoiceServiceImpl.getInvoiceOutputInfo(request);
-        XSSFWorkbook xssfWorkbook = ExcelReaderUtil.getBook("D:\\var\\RZSD-TEMPLATE.xlsx");
+        XSSFWorkbook xssfWorkbook = ExcelReaderUtil.getBook("/opt/rzsd/RZSD-TEMPLATE.xlsx");
         XSSFSheet sheet = xssfWorkbook.getSheet("TEMPLATE");
 
         XSSFCellStyle style = xssfWorkbook.createCellStyle();
@@ -197,7 +249,7 @@ public class RestFullController {
 
         xssfWorkbook.setPrintArea(0, 0, 9, 0, rowNo);
         try {
-            FileOutputStream fos = new FileOutputStream("D:\\var\\RZSD-TEMPLATE.xlsx");
+            FileOutputStream fos = new FileOutputStream("/opt/rzsd/RZSD-TEMPLATE.xlsx");
             xssfWorkbook.setForceFormulaRecalculation(true);
             xssfWorkbook.write(fos);
             xssfWorkbook.close();
@@ -206,7 +258,7 @@ public class RestFullController {
             e.printStackTrace();
         }
 
-        File file = new File("D:\\var\\RZSD-TEMPLATE.xlsx");
+        File file = new File("/opt/rzsd/RZSD-TEMPLATE.xlsx");
         response.setHeader("content-type", "application/octet-stream");
         response.setContentType("application/octet-stream");
         response.setHeader("Content-Disposition", "attachment;filename=RZSD-TEMPLATE.xlsx");
@@ -248,7 +300,7 @@ public class RestFullController {
         // // wechatInvoiceLogicImpl.createInvoice(inputMsg, response);
         // wechatUserLogicImpl.createUser(inputMsg, response);
         List<TInvoice> invoiceLst = invoiceServiceImpl.getInvoiceOutputInfo(request);
-        XSSFWorkbook xssfWorkbook = ExcelReaderUtil.getBook("D:\\var\\RZSD-TEMPLATE.xlsx");
+        XSSFWorkbook xssfWorkbook = ExcelReaderUtil.getBook("/opt/rzsd/RZSD-TEMPLATE.xlsx");
         XSSFSheet sheet = xssfWorkbook.getSheet("TEMPLATE");
 
         XSSFCellStyle style = xssfWorkbook.createCellStyle();
@@ -291,7 +343,7 @@ public class RestFullController {
 
         xssfWorkbook.setPrintArea(0, 0, 9, 0, rowNo);
         try {
-            FileOutputStream fos = new FileOutputStream("D:\\\\var\\\\RZSD-TEMPLATE.xlsx");
+            FileOutputStream fos = new FileOutputStream("/opt/rzsd/RZSD-TEMPLATE.xlsx");
             xssfWorkbook.setForceFormulaRecalculation(true);
             xssfWorkbook.write(fos);
             xssfWorkbook.close();

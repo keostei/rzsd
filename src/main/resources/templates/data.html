@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/ui.jqgrid-bootstrap.css" />
+    <link rel="stylesheet" href="css/jqgrid.theme/hot-sneaks/jquery-ui-1.8.16.custom.css" />
+    <link rel="stylesheet" href="css/bootstrap-select.min.css" />
+    <!-- The jQuery library is a prerequisite for all jqSuite products -->
+    <script src="js/jquery-2.1.1.min.js"></script>
+    <script type="text/ecmascript" src="js/bootstrap-select.min.js"></script> 
+    <!-- We support more than 40 localizations -->
+    <script type="text/ecmascript" src="js/i18n/grid.locale-cn.js"></script>
+    <!-- This is the Javascript file of jqGrid -->   
+    <script type="text/ecmascript" src="js/jquery.jqGrid.js"></script>
+    <script type="text/ecmascript" src="js/common.js"></script>
+    <script type="text/ecmascript" src="js/data.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+    <meta charset="utf-8" />
+    <title>数据个别查询修改</title>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <form action="" id="form" method="post">
+                <div class="from_box mar_b50 clearfix">
+                    <div class="from_box_tit clearfix">
+                        <h4>数据个别查询修改</h4>
+                       <!--  <a href="" class="btn btn-info">导入</a> -->
+                    </div>
+                    <div class="col-xs-12">
+                        <div class="form-group col-xs-4">
+                            <label class="control-label">客户编码</label>
+                            <input type="text" name="wxnc"  id="txtCondCustomCd" class="form-control" placeholder="查询用客户编码" />
+                        </div>
+                        <div class="form-group col-xs-4">
+                            <label class="control-label">收件人</label>
+                            <input type="text" name="shoujr"  id="txtCondName" class="form-control" placeholder="查询收件人关键字" />
+                        </div>
+                        <div class="form-group col-xs-4" >
+                            <label class="control-label">状态</label><br/>
+                            <select class="selectpicker" name="cxstatus" id="txtCondInvoiceStatus">
+                                <option value="">全部</option>
+                                <option value="1">已预约</option>
+                                <option value="2">已取货</option>
+                                <option value="3">打包完成</option>
+                                <option value="4">已出库</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-xs-4">
+                            <label class="control-label">取件日期范围(开始)</label>
+                            <input type="date" name="qjrqFrom" id="txtCondInvoiceDateFrom" class="form-control" placeholder="取件日期" th:value="${condInvoiceDateFrom}"  />
+                        </div>
+                        <div class="form-group col-xs-4">
+                            <label class="control-label">取件日期范围（终了）</label>
+                            <input type="date" name="qjrqTo" id="txtCondInvoiceDateTo" class="form-control" placeholder="取件日期"  th:value="${condInvoiceDateTo}"  />
+                        </div>
+                        <div class="form-group col-xs-2" style="margin-top: 20px;">
+                            <a href="javascript:void(0);" class="btn btn-info" onclick="onDaoruClick();">查询</a>
+                        </div>
+                    </div>
+                    <div class="col-xs-12" id="divResultDetail" >
+                        <table id="jqGrid"></table>
+                        <div id="jqGridPager"></div>
+                    </div>
+                    <div class="col-xs-12" style="padding-top: 30px;" id="divResultEdit" >
+                        <div class="form-group col-xs-4">
+                            <label class="control-label">客户编码</label>
+                            <input type="text" name="khbm" id="txtCustomCd" class="form-control" placeholder="标识唯一收件地址的客户编码"  readonly="readonly"  />
+                        </div>
+                        <div class="form-group col-xs-4" >
+                            <label class="control-label">总重量（KG）</label>
+                            <input type="number" name="zzl" id="txtTotalWeight" class="form-control" placeholder="该批次包裹总重量" style="text-align : right" />
+                        </div>
+                        <div class="form-group col-xs-4" >
+                            <label class="control-label">运费价格（日元）</label>
+                            <input type="number" name="yfjg" id="txtInvoiceAmountJpy" class="form-control" placeholder="运费价格" style="text-align : right" />
+                        </div>
+                        <div class="form-group col-xs-4" >
+                            <label class="control-label">内部编号</label>
+                            <input name="nbbh" id="txtDispLotNo" class="form-control" placeholder="包裹内部编号，如果尚未完成打包编号，则不用填写" />
+                        </div>
+                        <div class="form-group col-xs-4" >
+                            <label class="control-label">物流单号</label>
+                            <input name="kddh" id="txtDispTrackingNo" class="form-control" placeholder="国内物流单号，如果尚未完成打包，则不用填写" />
+                        </div>
+                        <div class="form-group col-xs-4" >
+                            <label class="control-label">包裹重量（KG）</label>
+                            <input name="bgzl" id="txtDispWeight" class="form-control" placeholder="每个包裹的重量，如果尚未完成打包，则不用填写" />
+                        </div>
+                        <div class="form-group col-xs-12" >
+                            <label class="control-label">地址</label>
+                            <input type="text" name="address" id="txtAddress" class="form-control" placeholder="国内收件人地址" />
+                        </div>
+                        <div class="form-group col-xs-4" >
+                            <label class="control-label">收件人</label>
+                            <input type="text" name="sjr" id="txtName" class="form-control" placeholder="国内收件人姓名" />
+                        </div>
+                        <div class="form-group col-xs-4" >
+                            <label class="control-label">状态</label><br/>
+                            <select class="selectpicker" name="status" id="selInvoiceStatus">
+                                <option value="1">已预约</option>
+                                <option value="2">已取货</option>
+                                <option value="3">打包完成</option>
+                                <option value="4">已出库</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-xs-4" style="margin-top: 20px;">
+                            <input type="hidden" id="hidInvoiceId" />
+                            <a href="javascript:void(0);" class="btn btn-info" id="btnModify">修改</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -2,6 +2,7 @@ package com.rzsd.wechat.service;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.rzsd.wechat.common.dto.InvoiceData;
 import com.rzsd.wechat.common.dto.TInvoice;
 import com.rzsd.wechat.common.dto.TInvoiceDetail;
 import com.rzsd.wechat.common.mapper.TInvoiceDetailMapper;
@@ -180,6 +182,96 @@ public class InvoiceServiceImpl implements InvoiceService {
             tInvoiceDetail.setStatusName(InvoiceDetailStatus.getCodeAsName(tInvoiceDetail.getStatus()));
         }
         return invoiceDetailLst;
+    }
+
+    @Override
+    public List<InvoiceData> searchInvoiceData(InvoiceData invoiceDataCond) {
+
+        List<InvoiceData> invoiceDataLst = tInvoiceMappper.getInvoiceData(invoiceDataCond);
+        List<InvoiceData> result = new ArrayList<>();
+        String invoiceId = "";
+        String dispLotNo = "";
+        String dispTrackingNo = "";
+        String dispWeight = "";
+        for (InvoiceData invoiceData : invoiceDataLst) {
+            if (invoiceId == null || !invoiceId.equals(invoiceData.getInvoiceId())) {
+                if (dispLotNo.length() > 0) {
+                    result.get(result.size() - 1).setDispLotNo(dispLotNo.substring(1));
+                }
+                if (dispTrackingNo.length() > 0) {
+                    result.get(result.size() - 1).setDispTrackingNo(dispTrackingNo.substring(1));
+                }
+                if (dispWeight.length() > 0) {
+                    result.get(result.size() - 1).setDispWeight(dispWeight.substring(1));
+                }
+                result.add(invoiceData);
+                invoiceData.setInvoiceStatusName(InvoiceStatus.getCodeAsName(invoiceData.getInvoiceStatus()));
+                dispLotNo = "";
+                dispTrackingNo = "";
+                dispWeight = "";
+            }
+            if (!StringUtils.isEmpty(invoiceData.getLotNo())) {
+
+                dispLotNo += "," + invoiceData.getLotNo();
+            }
+            if (!StringUtils.isEmpty(invoiceData.getTrackingNo())) {
+                dispTrackingNo += "," + invoiceData.getTrackingNo();
+            }
+            if (invoiceData.getWeight() != null && !BigDecimal.ZERO.equals(invoiceData.getWeight())) {
+                dispWeight += "," + invoiceData.getWeight().intValue();
+            }
+            invoiceId = invoiceData.getInvoiceId();
+        }
+        if (dispLotNo.length() > 0) {
+            result.get(result.size() - 1).setDispLotNo(dispLotNo.substring(1));
+        }
+        if (dispTrackingNo.length() > 0) {
+            result.get(result.size() - 1).setDispTrackingNo(dispTrackingNo.substring(1));
+        }
+        if (dispWeight.length() > 0) {
+            result.get(result.size() - 1).setDispWeight(dispWeight.substring(1));
+        }
+        return result;
+    }
+
+    @Override
+    public int editInvoiceData(InvoiceData invoiceDataCond, HttpServletRequest request) {
+        LoginUser loginUser = (LoginUser) request.getSession().getAttribute("LOGIN_USER");
+
+        BigDecimal rate = new BigDecimal(systemServiceImpl.getSysParamByKey("JPN_CNY_RATE").getParamValue())
+                .divide(new BigDecimal("100"));
+
+        TInvoice tInvoice = new TInvoice();
+        tInvoice.setInvoiceId(new BigInteger(invoiceDataCond.getInvoiceId()));
+        tInvoice.setTotalWeight(invoiceDataCond.getTotalWeight());
+        tInvoice.setInvoiceAmountJpy(new BigDecimal(invoiceDataCond.getInvoiceAmountJpy()));
+        tInvoice.setInvoiceAmountCny(tInvoice.getInvoiceAmountJpy().multiply(rate));
+        tInvoice.setName(invoiceDataCond.getName());
+        tInvoice.setAddress(invoiceDataCond.getAddress());
+        tInvoice.setInvoiceStatus(invoiceDataCond.getInvoiceStatus());
+        tInvoice.setUpdateId(loginUser.getId());
+        tInvoice.setUpdateTime(DateUtil.getCurrentTimestamp());
+        tInvoiceMappper.update(tInvoice);
+
+        String[] lotNoLst = invoiceDataCond.getDispLotNo().split(",");
+        String[] trackingNoLst = invoiceDataCond.getDispTrackingNo().split(",");
+        String[] weightLst = invoiceDataCond.getDispWeight().split(",");
+        for (int i = 0; i < lotNoLst.length; i++) {
+            TInvoiceDetail tInvoiceDetail = new TInvoiceDetail();
+            tInvoiceDetail.setInvoiceId(new BigInteger(invoiceDataCond.getInvoiceId()));
+            tInvoiceDetail.setRowNo(String.format("%03d", (i + 1)));
+            tInvoiceDetail.setLotNo(lotNoLst[i]);
+            tInvoiceDetail.setTrackingNo(trackingNoLst[i]);
+            tInvoiceDetail.setWeight(new BigDecimal(weightLst[i]));
+            tInvoiceDetail.setUpdateId(loginUser.getId());
+            tInvoiceDetail.setUpdateTime(DateUtil.getCurrentTimestamp());
+            if (tInvoiceDetailMapper.update(tInvoiceDetail) == 0) {
+                tInvoiceDetail.setCreateId(loginUser.getId());
+                tInvoiceDetail.setCreateTime(DateUtil.getCurrentTimestamp());
+                tInvoiceDetailMapper.insert(tInvoiceDetail);
+            }
+        }
+        return 0;
     }
 
 }

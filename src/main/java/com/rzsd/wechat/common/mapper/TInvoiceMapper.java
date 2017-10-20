@@ -2,6 +2,7 @@ package com.rzsd.wechat.common.mapper;
 
 import java.util.List;
 
+import com.rzsd.wechat.common.dto.InvoiceData;
 import com.rzsd.wechat.common.dto.TInvoice;
 
 public interface TInvoiceMapper {
@@ -13,4 +14,6 @@ public interface TInvoiceMapper {
     int update(TInvoice tInvoice);
 
     List<TInvoice> getPersonalInvoice(TInvoice selectCond);
+
+    List<InvoiceData> getInvoiceData(InvoiceData invoiceData);
 }
