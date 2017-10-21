@@ -1,14 +1,15 @@
 package com.rzsd.wechat.controller;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -38,12 +40,14 @@ import com.rzsd.wechat.common.dto.MCustomInfo;
 import com.rzsd.wechat.common.dto.TInvoice;
 import com.rzsd.wechat.entity.InvoiceDeliver;
 import com.rzsd.wechat.exception.BussinessException;
+import com.rzsd.wechat.form.ImportDataForm;
 import com.rzsd.wechat.logic.WechatInvoiceLogic;
 import com.rzsd.wechat.logic.WechatUserLogic;
 import com.rzsd.wechat.service.InvoiceService;
 import com.rzsd.wechat.service.LoginService;
 import com.rzsd.wechat.service.SystemService;
 import com.rzsd.wechat.service.UserService;
+import com.rzsd.wechat.util.DateUtil;
 import com.rzsd.wechat.util.ExcelReaderUtil;
 
 @RestController
@@ -60,9 +64,19 @@ public class RestFullController {
     private UserService userServiceImpl;
     @Autowired
     private SystemService systemServiceImpl;
-
     @Autowired
     private LoginService loginServiceImpl;
+
+    @Value("${rzsd.output.template.path}")
+    private String templatePath;
+    @Value("${rzsd.output.template.name}")
+    private String templateName;
+    @Value("${rzsd.output.file.path}")
+    private String outputPath;
+    @Value("${rzsd.output.file.name}")
+    private String outputName;
+    @Value("${rzsd.input.file.path}")
+    private String inputPath;
 
     @RequestMapping("/login/auth")
     public BaseJsonDto auth(Model model, HttpServletRequest request, HttpServletResponse response) {
@@ -116,9 +130,21 @@ public class RestFullController {
 
     @RequestMapping("/system/import")
     @WebAuth(lever = { "3" })
-    public BaseJsonDto importData(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public BaseJsonDto importData(ImportDataForm form, HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        // inputPath
+        String filePath = inputPath + form.getUploadFile().getOriginalFilename();
+        File inputFile = new File(filePath);
+        OutputStream os = new FileOutputStream(inputFile);
+        int bytesRead = 0;
+        byte[] buffer = new byte[8192];
+        InputStream ins = form.getUploadFile().getInputStream();
+        while ((bytesRead = ins.read(buffer, 0, 8192)) != -1) {
+            os.write(buffer, 0, bytesRead);
+        }
+        os.close();
         BaseJsonDto result = new BaseJsonDto();
-        XSSFWorkbook xssfWorkbook = ExcelReaderUtil.getBook("/opt/rzsd/RZSD-TEMPLATE.xlsx");
+        XSSFWorkbook xssfWorkbook = ExcelReaderUtil.getBook(filePath);
         XSSFSheet sheet = xssfWorkbook.getSheet("TEMPLATE");
         XSSFRow row = null;
         int rowNum = 2;
@@ -133,13 +159,7 @@ public class RestFullController {
             invoiceDeliver.setInvoiceId(new BigInteger(ExcelReaderUtil.getCellValue(row, 0)));
             invoiceDeliver.setInvoiceStatusName(ExcelReaderUtil.getCellValue(row, 6));
             invoiceDeliver.setLogNo(ExcelReaderUtil.getCellValue(row, 7));
-            // String trackingNo = null;
-            // Object trackingNoObj = ExcelReaderUtil.getCellValue(row, 8);
-            // if (trackingNoObj instanceof Double) {
-            // Double d = (Double) trackingNoObj;
-            // System.out.println(d.toString());
-            // System.out.println(String.valueOf(d));
-            // }
+
             invoiceDeliver.setTrackingNo(ExcelReaderUtil.getCellValue(row, 8));
             invoiceDeliver.setWeight(new BigDecimal(ExcelReaderUtil.getCellValue(row, 9)));
             invoiceDeliverLst.add(invoiceDeliver);
@@ -200,13 +220,29 @@ public class RestFullController {
         return result;
     }
 
-    @RequestMapping("download_invoice_output")
+    @RequestMapping("/system/invoice_output")
     @WebAuth(lever = { "3" })
     public BaseJsonDto downLoadInvoiceOutput(Model model, HttpServletRequest request, HttpServletResponse response)
             throws UnsupportedEncodingException, IOException {
 
+        FileInputStream ins = new FileInputStream(templatePath + templateName);
+        String newFilePath = outputPath
+                + MessageFormat.format(outputName, DateUtil.format(DateUtil.getCurrentTimestamp(), "yyyyMMdd"));
+        File newFile = new File(newFilePath);
+        if (newFile.exists()) {
+            newFile.delete();
+        }
+        FileOutputStream out = new FileOutputStream(newFile);
+        byte[] b = new byte[1024];
+        int n = 0;
+        while ((n = ins.read(b)) != -1) {
+            out.write(b, 0, n);
+        }
+        ins.close();
+        out.close();
+
         List<TInvoice> invoiceLst = invoiceServiceImpl.getInvoiceOutputInfo(request);
-        XSSFWorkbook xssfWorkbook = ExcelReaderUtil.getBook("/opt/rzsd/RZSD-TEMPLATE.xlsx");
+        XSSFWorkbook xssfWorkbook = ExcelReaderUtil.getBook(newFilePath);
         XSSFSheet sheet = xssfWorkbook.getSheet("TEMPLATE");
 
         XSSFCellStyle style = xssfWorkbook.createCellStyle();
@@ -249,7 +285,7 @@ public class RestFullController {
 
         xssfWorkbook.setPrintArea(0, 0, 9, 0, rowNo);
         try {
-            FileOutputStream fos = new FileOutputStream("/opt/rzsd/RZSD-TEMPLATE.xlsx");
+            FileOutputStream fos = new FileOutputStream(newFile);
             xssfWorkbook.setForceFormulaRecalculation(true);
             xssfWorkbook.write(fos);
             xssfWorkbook.close();
@@ -257,35 +293,9 @@ public class RestFullController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        File file = new File("/opt/rzsd/RZSD-TEMPLATE.xlsx");
-        response.setHeader("content-type", "application/octet-stream");
-        response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment;filename=RZSD-TEMPLATE.xlsx");
-        byte[] buff = new byte[1024];
-        BufferedInputStream bis = null;
-        OutputStream os = null;
-        try {
-            os = response.getOutputStream();
-            bis = new BufferedInputStream(new FileInputStream(file));
-            int i = bis.read(buff);
-            while (i != -1) {
-                os.write(buff, 0, buff.length);
-                os.flush();
-                i = bis.read(buff);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (bis != null) {
-                try {
-                    bis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return new BaseJsonDto();
+        BaseJsonDto result = new BaseJsonDto();
+        result.setFail(false);
+        return result;
     }
 
     @RequestMapping("test")
