@@ -87,6 +87,20 @@ public class RestFullController {
         return result;
     }
 
+    @RequestMapping("/login/regist")
+    public BaseJsonDto regist(Model model, HttpServletRequest request, HttpServletResponse response) {
+        BaseJsonDto result = new BaseJsonDto();
+        String userName = request.getParameter("userName");
+        String password = request.getParameter("password");
+        String customId = request.getParameter("customId");
+        String name = request.getParameter("name");
+        String address = request.getParameter("address");
+        String telNo = request.getParameter("telNo");
+        boolean authRes = loginServiceImpl.doRegist(userName, password, customId, name, address, telNo, request);
+        result.setFail(!authRes);
+        return result;
+    }
+
     @RequestMapping("/custom/edit")
     @WebAuth
     public BaseJsonDto editCustom(Model model, HttpServletRequest request, HttpServletResponse response) {
@@ -270,6 +284,7 @@ public class RestFullController {
                 row.createCell(3).setCellValue(invoice.getName());
                 row.createCell(4).setCellValue(invoice.getTelNo());
                 row.createCell(5).setCellValue(invoice.getAddress());
+                row.createCell(6).setCellValue("4：已出库");
             } else {
                 row.getCell(0).setCellValue(String.valueOf(invoice.getInvoiceId()));
                 row.getCell(1).setCellValue(formatter.format(invoice.getInvoiceDate()));
@@ -277,9 +292,14 @@ public class RestFullController {
                 row.getCell(3).setCellValue(invoice.getName());
                 row.getCell(4).setCellValue(invoice.getTelNo());
                 row.getCell(5).setCellValue(invoice.getAddress());
+                row.getCell(6).setCellValue("4：已出库");
             }
-            for (int i = 0; i < 6; i++) {
-                row.getCell(i).setCellStyle(style);
+            for (int i = 0; i < 10; i++) {
+                if (row.getCell(i) == null) {
+                    row.createCell(i).setCellStyle(style);
+                } else {
+                    row.getCell(i).setCellStyle(style);
+                }
             }
         }
 

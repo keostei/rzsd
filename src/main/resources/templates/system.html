@@ -35,12 +35,30 @@
                             <div class="panel panel-danger">
                                 <div class="panel-heading">下载客户数据</div>
                                 <div class="panel-body">
-                                    <!-- <div class="form-group">
-                                        <label class="control-label">一键清关批次</label>
-                                        <input type="text" name="price" class="form-control" placeholder="请输入清关批次号" value="RZ-201710-A"/>
-                                    </div> -->
                                     <div class="col-xs-12 mar_b20">
                                         <input type="submit" name="sub" class="btn btn-default col-xs-12" id="btnDownloadCustomInfo" value="下载未发货客户信息数据" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel panel-danger">
+                                <div class="panel-heading">单号批量导入</div>
+                                <div class="panel-body">
+                                    <form method="POST" enctype="multipart/form-data" id="uploadForm">
+	                                    <div class="form-group col-xs-10">
+	                                        <label class="control-label">选择批量导入文件</label>
+	                                        <input type="file" id="uploadFile" name="uploadFile" />
+	                                    </div>
+	                                    <div class="form-group col-xs-2" style="margin-top: 20px;">
+	                                        <a href="javascript:void(0);" class="btn btn-info" id="btnImport">导入</a>
+	                                    </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="panel panel-danger">
+                                <div class="panel-heading">数据查询修改</div>
+                                <div class="panel-body">
+                                    <div class="col-xs-12 mar_b20">
+                                        <input type="submit" name="sub" class="btn btn-default col-xs-12" id="btnDataModify"  value="数据查询修改" />
                                     </div>
                                 </div>
                             </div>
