@@ -30,4 +30,6 @@ public interface InvoiceService {
     List<InvoiceData> searchInvoiceData(InvoiceData invoiceDataCond);
 
     int editInvoiceData(InvoiceData invoiceDataCond, HttpServletRequest request);
+
+    int doAppointment(TInvoice tInvoice, HttpServletRequest request);
 }

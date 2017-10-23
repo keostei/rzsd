@@ -101,6 +101,24 @@ public class RestFullController {
         return result;
     }
 
+    @RequestMapping("/custom/appoint")
+    @WebAuth
+    public BaseJsonDto appointInfo(HttpServletRequest request, HttpServletResponse response) {
+        BaseJsonDto result = new BaseJsonDto();
+        TInvoice tInvoice = new TInvoice();
+        tInvoice.setInvoiceDate(DateUtil.parse(request.getParameter("invoiceDate")));
+        tInvoice.setInvoiceTimeCd(request.getParameter("invoiceTimeCd"));
+        tInvoice.setInvoideAddress(request.getParameter("invoideAddress"));
+        tInvoice.setWeight(new BigDecimal(request.getParameter("weight")));
+        tInvoice.setCustomCd(request.getParameter("customCd"));
+        tInvoice.setName(request.getParameter("name"));
+        tInvoice.setTelNo(request.getParameter("telNo"));
+        tInvoice.setAddress(request.getParameter("address"));
+        tInvoice.setInvoiceRequirement(request.getParameter("invoiceRequirement"));
+        invoiceServiceImpl.doAppointment(tInvoice, request);
+        return result;
+    }
+
     @RequestMapping("/custom/edit")
     @WebAuth
     public BaseJsonDto editCustom(Model model, HttpServletRequest request, HttpServletResponse response) {

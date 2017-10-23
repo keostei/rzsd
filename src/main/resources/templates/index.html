@@ -41,22 +41,22 @@
                             </div>
                             <div class="form-group">
                                 <label class="control-label">取件时间</label>
-                                <input type="date" name="consume_time" class="form-control" style="-webkit-appearance: none;line-height: 20px" />
-                                <select style="width: 100%;height: 34px;margin-top: 5px;">
-                                  <option value="volvo">12:00之前</option>
-                                  <option value="saab">12:00-15:00</option>
-                                  <option value="opel" selected="selected">15:00-18:00</option>
-                                  <option value="audi">18:00-21:00</option>
-                                  <option value="audi">21:00之后</option>
+                                <input type="date" id="txtInvoiceDate" class="form-control" style="-webkit-appearance: none;line-height: 20px" />
+                                <select style="width: 100%;height: 34px;margin-top: 5px;" id="txtInvoiceTimeCd">
+                                  <option value="1">12:00之前</option>
+                                  <option value="2">12:00-15:00</option>
+                                  <option value="3" selected="selected">15:00-18:00</option>
+                                  <option value="4">18:00-21:00</option>
+                                  <option value="5">21:00之后</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label class="control-label">取件地址</label>
-                                <input type="text" name="passport_no" class="form-control" placeholder="取件地址，请尽量填写详细。" style="text-transform : uppercase" />
+                                <input type="text" id="txtInvoideAddress" class="form-control" placeholder="取件地址，请尽量填写详细。" />
                             </div>
                             <div class="form-group">
                                 <label class="control-label">取件估重</label>
-                                <input type="text" name="price" class="form-control" placeholder="估算取件的大致重量。单位：KG" />
+                                <input type="number" id="txtWeight" class="form-control" placeholder="估算取件的大致重量。单位：KG" />
                             </div>
                             <div class="form-group">
                                 <label class="control-label">客户编码</label>
@@ -67,16 +67,16 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <input type="text" name="price" class="form-control" placeholder="国内收件人姓名" value="郑超" readonly="readonly" style="background-color:#fff;border:none;"/>
-                                <input type="text" name="price" class="form-control" placeholder="国内收件人联系电话，很重要" value="13951741096" readonly="readonly" style="background-color:#fff;border:none;"/>
-                                <textarea  rows="2" name="price" class="form-control" placeholder="国内收件人地址，很重要"  readonly="readonly" style="background-color:#fff;border:none;">江苏省南京市建邺区奥体大街69号新城科技园14楼</textarea>
+                                <input type="text" id="txtName" class="form-control" placeholder="国内收件人姓名"  readonly="readonly" style="background-color:#fff;border:none;"/>
+                                <input type="text" id="txtTelNo" class="form-control" placeholder="国内收件人联系电话，很重要" readonly="readonly" style="background-color:#fff;border:none;"/>
+                                <textarea  rows="2" id="txtAddress" class="form-control" placeholder="国内收件人地址，很重要"  readonly="readonly" style="background-color:#fff;border:none;"></textarea>
                             </div>
                             <div class="form-group">
                                 <label class="control-label">其他要求</label>
-                                <input type="text" name="odd_numbers" class="form-control" placeholder="其他要求" />
+                                <input type="text" id="txtInvoiceRequirement" class="form-control" placeholder="其他要求" />
                             </div>
                             <div class="col-xs-12 mar_b20">
-                                <input type="submit" name="sub" class="btn btn-default col-xs-12" id="btnConfirm" value="确定预约" />
+                                <input type="submit" name="sub" class="btn btn-default col-xs-12" id="btnAppointment" value="确定预约" />
                             </div>
     
                             <!--提示信息-->
@@ -123,22 +123,22 @@
                             <div class="from_box_tit clearfix">
                                 <h4>收件地址</h4>
                             </div>
-                            <div class="panel panel-success" th:each="customInfo,iterStat:${customInfoLst}" >
+                            <div class="panel panel-success" th:each="customInfo,iterStat:${customInfoLst}"  >
                                 <div class="panel-heading" th:text="${'客户编码：' + customInfo.customId + customInfo.rowNo}">客户编码：AOKNS-01（默认）</div>
                                 <div class="panel-body">
 	                                <div class="form-group rzsd-address">
 	                                    <label class="control-label">地址</label>
 	                                    <textarea rows="2" class="form-control" placeholder="填写收件详细地址" th:text="${customInfo.address}"></textarea>
 	                                </div>
-	                                <div class="form-group">
+	                                <div class="form-group rzsd-name">
 	                                    <label class="control-label">收件人姓名</label>
 	                                    <input type="text" class="form-control" placeholder="国内收件人姓名" th:value="${customInfo.name}" />
 	                                </div>
-	                                <div class="form-group">
+	                                <div class="form-group rzsd-telno">
 	                                    <label class="control-label">收件人电话</label>
 	                                    <input type="text" class="form-control" placeholder="国内收件人联系电话，很重要" th:value="${customInfo.telNo}" />
 	                                </div>
-	                                <div class="col-xs-12 mar_b20">
+	                                <div class="col-xs-12 mar_b20 rzsd-customcd">
 	                                    <input type="submit" name="sub" class="btn btn-default col-xs-12 save-adderss"  value="保存" />
 	                                    <input type="hidden" class="save-address-customid" th:value="${customInfo.customId}" />
 	                                    <input type="hidden" class="save-address-rowno" th:value="${customInfo.rowNo}" />

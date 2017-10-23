@@ -274,4 +274,14 @@ public class InvoiceServiceImpl implements InvoiceService {
         return 0;
     }
 
+    @Override
+    public int doAppointment(TInvoice tInvoice, HttpServletRequest request) {
+        LoginUser loginUser = (LoginUser) request.getSession().getAttribute("LOGIN_USER");
+        tInvoice.setInvoiceStatus(InvoiceStatus.YUYUE.getCode());
+        tInvoice.setCreateId(loginUser.getId());
+        tInvoice.setUpdateId(loginUser.getId());
+        tInvoiceMappper.insert(tInvoice);
+        return 0;
+    }
+
 }
