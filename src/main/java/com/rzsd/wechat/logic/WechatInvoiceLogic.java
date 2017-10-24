@@ -12,4 +12,6 @@ public interface WechatInvoiceLogic {
     void createInvoice(InputMessage inputMsg, HttpServletResponse response)
             throws UnsupportedEncodingException, IOException;
 
+    void queryInvoice(InputMessage inputMsg, HttpServletResponse response)
+            throws UnsupportedEncodingException, IOException;
 }

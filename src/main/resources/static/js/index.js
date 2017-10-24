@@ -73,7 +73,7 @@ $(function(){
             	'address': $('#txtAddress').val(),
             	'invoiceRequirement': $('#txtInvoiceRequirement').val()},
             onSuccess : function(json) {
-                alert('预约申请已提交！<br />为了更好的解约您的时间，建议添加工作人员微信号确定取货时间，谢谢！');
+                alert('预约申请已提交！\n为了更好的解约您的时间，建议添加工作人员微信号确定取货时间，谢谢！');
             }
         });
         return false;

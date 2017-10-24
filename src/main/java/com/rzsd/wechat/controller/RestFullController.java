@@ -49,6 +49,7 @@ import com.rzsd.wechat.service.SystemService;
 import com.rzsd.wechat.service.UserService;
 import com.rzsd.wechat.util.DateUtil;
 import com.rzsd.wechat.util.ExcelReaderUtil;
+import com.rzsd.wechat.util.InputMessage;
 
 @RestController
 @RequestMapping("/rest")
@@ -341,64 +342,13 @@ public class RestFullController {
     public void test(Model model, HttpServletRequest request, HttpServletResponse response)
             throws UnsupportedEncodingException, IOException {
 
-        // InputMessage inputMsg = new InputMessage();
-        // inputMsg.setFromUserName("oyti2juH1-7x3mBjovXuIA_8LQKg");
-        // inputMsg.setToUserName("KEOSIMAGE");
-        // inputMsg.setContent("创建账号 zhengc 郑超 ChinaVnet86!");
-        // // wechatInvoiceLogicImpl.createInvoice(inputMsg, response);
+        InputMessage inputMsg = new InputMessage();
+        inputMsg.setFromUserName("oyti2juH1-7x3mBjovXuIA_8LQKg");
+        inputMsg.setToUserName("KEOSIMAGE");
+        inputMsg.setContent("创建账号 zhengc 郑超 ChinaVnet86!");
+        wechatInvoiceLogicImpl.queryInvoice(inputMsg, response);
         // wechatUserLogicImpl.createUser(inputMsg, response);
-        List<TInvoice> invoiceLst = invoiceServiceImpl.getInvoiceOutputInfo(request);
-        XSSFWorkbook xssfWorkbook = ExcelReaderUtil.getBook("/opt/rzsd/RZSD-TEMPLATE.xlsx");
-        XSSFSheet sheet = xssfWorkbook.getSheet("TEMPLATE");
 
-        XSSFCellStyle style = xssfWorkbook.createCellStyle();
-        // 设置边框样式
-        style.setBorderTop(HSSFCellStyle.BORDER_THIN);
-        style.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-        style.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-        style.setBorderRight(HSSFCellStyle.BORDER_THIN);
-        // 设置边框颜色
-        style.setTopBorderColor(HSSFColor.BLACK.index);
-        style.setBottomBorderColor(HSSFColor.BLACK.index);
-        style.setLeftBorderColor(HSSFColor.BLACK.index);
-        style.setRightBorderColor(HSSFColor.BLACK.index);
-
-        int rowNo = 1;
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        for (TInvoice invoice : invoiceLst) {
-            rowNo++;
-            XSSFRow row = sheet.getRow(rowNo);
-            if (row == null) {
-                row = sheet.createRow(rowNo);
-                row.createCell(0).setCellValue(String.valueOf(invoice.getInvoiceId()));
-                row.createCell(1).setCellValue(formatter.format(invoice.getInvoiceDate()));
-                row.createCell(2).setCellValue(invoice.getCustomCd());
-                row.createCell(3).setCellValue(invoice.getName());
-                row.createCell(4).setCellValue(invoice.getTelNo());
-                row.createCell(5).setCellValue(invoice.getAddress());
-            } else {
-                row.getCell(0).setCellValue(String.valueOf(invoice.getInvoiceId()));
-                row.getCell(1).setCellValue(formatter.format(invoice.getInvoiceDate()));
-                row.getCell(2).setCellValue(invoice.getCustomCd());
-                row.getCell(3).setCellValue(invoice.getName());
-                row.getCell(4).setCellValue(invoice.getTelNo());
-                row.getCell(5).setCellValue(invoice.getAddress());
-            }
-            for (int i = 0; i < 6; i++) {
-                row.getCell(i).setCellStyle(style);
-            }
-        }
-
-        xssfWorkbook.setPrintArea(0, 0, 9, 0, rowNo);
-        try {
-            FileOutputStream fos = new FileOutputStream("/opt/rzsd/RZSD-TEMPLATE.xlsx");
-            xssfWorkbook.setForceFormulaRecalculation(true);
-            xssfWorkbook.write(fos);
-            xssfWorkbook.close();
-            fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @ExceptionHandler(BussinessException.class) // (1)

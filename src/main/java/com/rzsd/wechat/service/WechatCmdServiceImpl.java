@@ -109,6 +109,10 @@ public class WechatCmdServiceImpl implements WechatCmdService {
                 wechatInvoiceLogicImpl.createInvoice(inputMsg, response);
                 return;
             }
+            if (inputMsg.getContent().startsWith("查询")) {
+                wechatInvoiceLogicImpl.queryInvoice(inputMsg, response);
+                return;
+            }
 
             String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
                     inputMsg.getToUserName(), returnTime, "text", "您发的指令我们还在开发中。。。请耐心等待！");

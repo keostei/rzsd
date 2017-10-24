@@ -135,10 +135,10 @@
          <where>
             A.del_flg = '0' 
             <if test="condCustomCd != null and condCustomCd != ''">
-                AND A.custom_cd like LIKE concat(concat('%',#{condCustomCd}),'%')
+                AND A.custom_cd  LIKE concat(concat('%',#{condCustomCd}),'%')
             </if>
             <if test="condName != null and condName != ''">
-                AND A.name like LIKE concat(concat('%',#{condName}),'%')
+                AND A.name  LIKE concat(concat('%',#{condName}),'%')
             </if>
             <if test="condInvoiceStatus != null and condInvoiceStatus != ''">
                 AND A.invoice_status = #{condInvoiceStatus}
