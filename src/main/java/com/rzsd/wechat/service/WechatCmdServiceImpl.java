@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.rzsd.wechat.common.constrant.RzConst;
 import com.rzsd.wechat.enmu.MsgType;
 import com.rzsd.wechat.logic.WechatCustomIdLogic;
+import com.rzsd.wechat.logic.WechatHelpLogic;
 import com.rzsd.wechat.logic.WechatInvoiceLogic;
 import com.rzsd.wechat.logic.WechatSubscribeLogic;
 import com.rzsd.wechat.logic.WechatUnSubscribeLogic;
@@ -42,6 +43,8 @@ public class WechatCmdServiceImpl implements WechatCmdService {
     private WechatUserLogic wechatUserLogicImpl;
     @Autowired
     private WechatInvoiceLogic wechatInvoiceLogicImpl;
+    @Autowired
+    private WechatHelpLogic wechatHelpLogicImpl;
 
     @Override
     public void acceptMessage(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -111,6 +114,11 @@ public class WechatCmdServiceImpl implements WechatCmdService {
             }
             if (inputMsg.getContent().startsWith("查询")) {
                 wechatInvoiceLogicImpl.queryInvoice(inputMsg, response);
+                return;
+            }
+
+            if (inputMsg.getContent().startsWith("预约")) {
+                wechatHelpLogicImpl.doAppointment(inputMsg, response);
                 return;
             }
 

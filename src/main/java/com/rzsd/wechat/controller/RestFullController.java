@@ -41,6 +41,7 @@ import com.rzsd.wechat.common.dto.TInvoice;
 import com.rzsd.wechat.entity.InvoiceDeliver;
 import com.rzsd.wechat.exception.BussinessException;
 import com.rzsd.wechat.form.ImportDataForm;
+import com.rzsd.wechat.logic.WechatHelpLogic;
 import com.rzsd.wechat.logic.WechatInvoiceLogic;
 import com.rzsd.wechat.logic.WechatUserLogic;
 import com.rzsd.wechat.service.InvoiceService;
@@ -59,6 +60,8 @@ public class RestFullController {
     private WechatInvoiceLogic wechatInvoiceLogicImpl;
     @Autowired
     private WechatUserLogic wechatUserLogicImpl;
+    @Autowired
+    private WechatHelpLogic wechatHelpLogicImpl;
     @Autowired
     private InvoiceService invoiceServiceImpl;
     @Autowired
@@ -345,10 +348,10 @@ public class RestFullController {
         InputMessage inputMsg = new InputMessage();
         inputMsg.setFromUserName("oyti2juH1-7x3mBjovXuIA_8LQKg");
         inputMsg.setToUserName("KEOSIMAGE");
-        inputMsg.setContent("创建账号 zhengc 郑超 ChinaVnet86!");
-        wechatInvoiceLogicImpl.queryInvoice(inputMsg, response);
+        inputMsg.setContent("预约");
+        // wechatInvoiceLogicImpl.queryInvoice(inputMsg, response);
         // wechatUserLogicImpl.createUser(inputMsg, response);
-
+        wechatHelpLogicImpl.doAppointment(inputMsg, response);
     }
 
     @ExceptionHandler(BussinessException.class) // (1)
