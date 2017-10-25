@@ -11,4 +11,6 @@ public interface WechatHelpLogic {
 
     void doAppointment(InputMessage inputMsg, HttpServletResponse response)
             throws UnsupportedEncodingException, IOException;
+
+    void doHelp(InputMessage inputMsg, HttpServletResponse response) throws UnsupportedEncodingException, IOException;
 }

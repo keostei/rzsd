@@ -117,7 +117,8 @@ public class WechatCmdServiceImpl implements WechatCmdService {
                 return;
             }
 
-            if (inputMsg.getContent().startsWith("预约")) {
+            if (inputMsg.getContent().startsWith("预约") || inputMsg.getContent().startsWith("取件")
+                    || inputMsg.getContent().startsWith("快递")) {
                 wechatHelpLogicImpl.doAppointment(inputMsg, response);
                 return;
             }
