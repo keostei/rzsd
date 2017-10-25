@@ -123,6 +123,11 @@ public class WechatCmdServiceImpl implements WechatCmdService {
                 return;
             }
 
+            if (inputMsg.getContent().startsWith("帮助")) {
+                wechatHelpLogicImpl.doHelp(inputMsg, response);
+                return;
+            }
+
             String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
                     inputMsg.getToUserName(), returnTime, "text", "您发的指令我们还在开发中。。。请耐心等待！");
             LOGGER.info(msg);
