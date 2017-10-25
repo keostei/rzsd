@@ -256,6 +256,15 @@ public class RestFullController {
         return result;
     }
 
+    @RequestMapping("/system/onekey_update")
+    @WebAuth(lever = { "3" })
+    public BaseJsonDto oneKeyUpdate(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        BaseJsonDto result = new BaseJsonDto();
+        invoiceServiceImpl.doOnekeyUpdate(request.getParameter("lotNo"), request);
+        result.setFail(false);
+        return result;
+    }
+
     @RequestMapping("/system/invoice_output")
     @WebAuth(lever = { "3" })
     public BaseJsonDto downLoadInvoiceOutput(Model model, HttpServletRequest request, HttpServletResponse response)

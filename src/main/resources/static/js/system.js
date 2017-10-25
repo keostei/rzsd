@@ -62,6 +62,19 @@ $(function(){
     	window.location.href = '/data';
     });
 
+    $('#btnOnekeyClear').click(function(){
+        doAjax({
+            url : 'rest/system/onekey_update',
+            type : 'POST',
+            dataType : "json",
+            data : {'lotNo': $('#txtLotNo').val()},
+            onSuccess : function(json) {
+            	alert('一键清关成功。');
+            }
+        });
+        return false;
+    });
+    
     $('#btnSetRate').click(function(){
         doAjax({
             url : 'rest/system/setrate',

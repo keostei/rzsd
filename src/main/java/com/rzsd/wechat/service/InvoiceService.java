@@ -32,4 +32,6 @@ public interface InvoiceService {
     int editInvoiceData(InvoiceData invoiceDataCond, HttpServletRequest request);
 
     int doAppointment(TInvoice tInvoice, HttpServletRequest request);
+
+    int doOnekeyUpdate(String lotNo, HttpServletRequest request);
 }

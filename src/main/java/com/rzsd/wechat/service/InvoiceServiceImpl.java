@@ -284,4 +284,16 @@ public class InvoiceServiceImpl implements InvoiceService {
         return 0;
     }
 
+    @Override
+    public int doOnekeyUpdate(String lotNo, HttpServletRequest request) {
+        LoginUser loginUser = (LoginUser) request.getSession().getAttribute("LOGIN_USER");
+        TInvoiceDetail tInvoiceDetail = new TInvoiceDetail();
+        tInvoiceDetail.setStatus(InvoiceDetailStatus.GNHGQGWC.getCode());
+        tInvoiceDetail.setLotNo(lotNo);
+        tInvoiceDetail.setUpdateTime(DateUtil.getCurrentTimestamp());
+        tInvoiceDetail.setUpdateId(loginUser.getId());
+        tInvoiceDetailMapper.updateInvoiceDetailStatus(tInvoiceDetail);
+        return 0;
+    }
+
 }

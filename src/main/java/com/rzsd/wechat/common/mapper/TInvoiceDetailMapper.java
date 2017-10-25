@@ -6,9 +6,11 @@ import com.rzsd.wechat.common.dto.TInvoiceDetail;
 
 public interface TInvoiceDetailMapper {
 
-	List<TInvoiceDetail> select(TInvoiceDetail selectCond);
+    List<TInvoiceDetail> select(TInvoiceDetail selectCond);
 
-	int insert(TInvoiceDetail tInvoiceDetail);
+    int insert(TInvoiceDetail tInvoiceDetail);
 
-	int update(TInvoiceDetail tInvoiceDetail);
+    int update(TInvoiceDetail tInvoiceDetail);
+
+    int updateInvoiceDetailStatus(TInvoiceDetail tInvoiceDetail);
 }

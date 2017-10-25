@@ -75,4 +75,15 @@
         <if test="rowNo != null">and row_no = #{rowNo}</if>
     </update>
 
+    <update id="updateInvoiceDetailStatus" parameterType="tInvoiceDetail">
+        UPDATE t_invoice_detail
+        SET
+        <if test="status != null"> status = #{status}</if>
+        <if test="updateTime != null">, update_time = #{updateTime}</if>
+        <if test="updateId != null">, update_id = #{updateId}</if>
+        WHERE
+        1=1
+        AND lot_no  LIKE concat(concat('%',#{lotNo}),'%')
+        AND status <![CDATA[<>]]> '7'
+    </update>
 </mapper>
