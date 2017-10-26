@@ -129,7 +129,8 @@ public class WechatCmdServiceImpl implements WechatCmdService {
             }
 
             String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text", "您发的指令我们还在开发中。。。请耐心等待！");
+                    inputMsg.getToUserName(), returnTime, "text",
+                    MessageFormat.format("您发的指令{0}系统暂时无法识别，已转交人工处理！", inputMsg.getContent()));
             LOGGER.info(msg);
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;

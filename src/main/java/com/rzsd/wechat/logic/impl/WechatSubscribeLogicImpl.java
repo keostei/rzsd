@@ -1,7 +1,6 @@
 package com.rzsd.wechat.logic.impl;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.List;
 
@@ -12,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.rzsd.wechat.common.constrant.RzConst;
 import com.rzsd.wechat.common.dto.MUser;
 import com.rzsd.wechat.common.mapper.MUserMapper;
 import com.rzsd.wechat.logic.WechatCustomIdLogic;
@@ -43,33 +43,33 @@ public class WechatSubscribeLogicImpl implements WechatSubscribeLogic {
         LOGGER.info(str.toString());
         try {
             MUser mUser = new MUser();
-            // 先跟根据OpenId检索该用户之前是否关注过，如果关注过则清空客户代码
+            // 先跟根据OpenId检索该用户之前是否关注过，如果关注过恢复用户删除flg
             mUser.setWechatOpenId(inputMsg.getFromUserName());
             List<MUser> mUserOldLst = mUserMapper.select(mUser);
             if (mUserOldLst.isEmpty()) {
                 mUser.setCustomId(wechatCustomIdLogicLogic.generateId(false, 'a'));
                 mUser.setUserType("0");
-                mUser.setCreateId(new BigInteger("1"));
-                mUser.setUpdateId(new BigInteger("1"));
+                mUser.setCreateId(RzConst.SYS_ADMIN_ID);
+                mUser.setUpdateId(RzConst.SYS_ADMIN_ID);
                 mUserMapper.insert(mUser);
                 LOGGER.info("创建新用户：" + mUser.getCustomId());
             } else {
                 mUser = mUserOldLst.get(0);
-                mUser.setUserName(null);
-                mUser.setPassword(null);
-                mUser.setNickName(null);
+                // mUser.setUserName(null);
+                // mUser.setPassword(null);
+                // mUser.setNickName(null);
                 mUser.setCustomId(wechatCustomIdLogicLogic.generateId(false, 'a'));
-                mUser.setUserType("0");
+                // mUser.setUserType("0");
                 mUser.setDelFlg("0");
                 mUser.setUpdateTime(DateUtil.getCurrentTimestamp());
-                mUser.setUpdateId(new BigInteger("1"));
+                mUser.setUpdateId(RzConst.SYS_ADMIN_ID);
                 mUserMapper.update(mUser);
                 LOGGER.info("取消关注用户重新关注：" + mUser.getCustomId());
             }
             response.getOutputStream().write(str.toString().getBytes("UTF-8"));
         } catch (IOException e) {
             e.printStackTrace();
-            LOGGER.info("post exception.");
+            LOGGER.error("post exception.");
             throw e;
         }
     }

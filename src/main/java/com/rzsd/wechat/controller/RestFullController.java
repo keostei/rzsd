@@ -41,6 +41,7 @@ import com.rzsd.wechat.common.dto.TInvoice;
 import com.rzsd.wechat.entity.InvoiceDeliver;
 import com.rzsd.wechat.exception.BussinessException;
 import com.rzsd.wechat.form.ImportDataForm;
+import com.rzsd.wechat.logic.WechatCustomIdLogic;
 import com.rzsd.wechat.logic.WechatHelpLogic;
 import com.rzsd.wechat.logic.WechatInvoiceLogic;
 import com.rzsd.wechat.logic.WechatUserLogic;
@@ -62,6 +63,8 @@ public class RestFullController {
     private WechatUserLogic wechatUserLogicImpl;
     @Autowired
     private WechatHelpLogic wechatHelpLogicImpl;
+    @Autowired
+    private WechatCustomIdLogic wechatCustomIdLogicImpl;
     @Autowired
     private InvoiceService invoiceServiceImpl;
     @Autowired
@@ -355,12 +358,14 @@ public class RestFullController {
             throws UnsupportedEncodingException, IOException {
 
         InputMessage inputMsg = new InputMessage();
-        inputMsg.setFromUserName("oyti2juH1-7x3mBjovXuIA_8LQKg");
+        inputMsg.setFromUserName("openId-test=001");
         inputMsg.setToUserName("KEOSIMAGE");
-        inputMsg.setContent("预约");
+        inputMsg.setContent("创建账号 seuzc SEUZHENGCHAO 001315");
+        // wechatCustomIdLogicImpl.updateCustomInfo(inputMsg, response);
+        // wechatInvoiceLogicImpl.createInvoice(inputMsg, response);
         // wechatInvoiceLogicImpl.queryInvoice(inputMsg, response);
-        // wechatUserLogicImpl.createUser(inputMsg, response);
-        wechatHelpLogicImpl.doAppointment(inputMsg, response);
+        wechatUserLogicImpl.createUser(inputMsg, response);
+        // wechatHelpLogicImpl.doAppointment(inputMsg, response);
     }
 
     @ExceptionHandler(BussinessException.class) // (1)

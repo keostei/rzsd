@@ -72,12 +72,27 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
+        // TODO:姓名check
+        // TODO:电话号码check
+        // TODO:地址check
         // 获取用户信息
         MUser selectCond = new MUser();
         selectCond.setWechatOpenId(inputMsg.getFromUserName());
         List<MUser> userList = mUserMapper.select(selectCond);
+        // 用户信息为查到时，先创建用户表
+        MUser mUser = new MUser();
+        if (userList.isEmpty()) {
+            mUser.setWechatOpenId(inputMsg.getFromUserName());
+            mUser.setCustomId(generateId(false, 'a'));
+            mUser.setUserType("0");
+            mUser.setCreateId(RzConst.SYS_ADMIN_ID);
+            mUser.setUpdateId(RzConst.SYS_ADMIN_ID);
+            mUserMapper.insert(mUser);
+        } else {
+            mUser = userList.get(0);
+        }
         MCustomInfo mCustomInfoCond = new MCustomInfo();
-        mCustomInfoCond.setCustomId(userList.get(0).getCustomId());
+        mCustomInfoCond.setCustomId(mUser.getCustomId());
         mCustomInfoCond.setOrderByStr(" row_no DESC ");
         List<MCustomInfo> mCustomInfoLst = mCustomInfoMapper.select(mCustomInfoCond);
         if (mCustomInfoLst.size() >= 3) {
@@ -88,7 +103,7 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
             return;
         }
         MCustomInfo mCustomInfo = new MCustomInfo();
-        mCustomInfo.setCustomId(userList.get(0).getCustomId());
+        mCustomInfo.setCustomId(mUser.getCustomId());
         if (mCustomInfoLst.isEmpty()) {
             mCustomInfo.setRowNo("1");
         } else {
@@ -97,8 +112,8 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
         mCustomInfo.setName(cmdLst[1]);
         mCustomInfo.setTelNo(cmdLst[2]);
         mCustomInfo.setAddress(cmdLst[3]);
-        mCustomInfo.setCreateId(userList.get(0).getId());
-        mCustomInfo.setUpdateId(userList.get(0).getId());
+        mCustomInfo.setCreateId(mUser.getId());
+        mCustomInfo.setUpdateId(mUser.getId());
         mCustomInfoMapper.insert(mCustomInfo);
 
         String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(), inputMsg.getToUserName(),
@@ -126,11 +141,28 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
+        // TODO:用户编码check
+        // TODO:姓名check
+        // TODO:电话号码check
+        // TODO:地址check
         // 获取用户信息
         MUser selectCond = new MUser();
         selectCond.setWechatOpenId(inputMsg.getFromUserName());
         List<MUser> userList = mUserMapper.select(selectCond);
-        if (!userList.get(0).getCustomId().equals(cmdLst[1].substring(0, 5))) {
+        // 用户信息为查到时，先创建用户表
+        MUser mUser = new MUser();
+        if (userList.isEmpty()) {
+            mUser.setWechatOpenId(inputMsg.getFromUserName());
+            mUser.setCustomId(generateId(false, 'a'));
+            mUser.setUserType("0");
+            mUser.setCreateId(RzConst.SYS_ADMIN_ID);
+            mUser.setUpdateId(RzConst.SYS_ADMIN_ID);
+            mUserMapper.insert(mUser);
+        } else {
+            mUser = userList.get(0);
+        }
+
+        if (!mUser.getCustomId().equalsIgnoreCase(cmdLst[1].substring(0, 5))) {
             String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
                     inputMsg.getToUserName(), returnTime, "text",
                     MessageFormat.format("您需要修改的地址编码【{0}】不正确，请重新输入。如需查询地址编号，请输入指令【查询地址】进行查询。", cmdLst[1]));
@@ -140,7 +172,7 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
         }
 
         MCustomInfo mCustomInfoCond = new MCustomInfo();
-        mCustomInfoCond.setCustomId(userList.get(0).getCustomId());
+        mCustomInfoCond.setCustomId(mUser.getCustomId());
         if (cmdLst[1].length() > 5) {
             mCustomInfoCond.setRowNo(cmdLst[1].substring(5, 6));
         } else {
@@ -184,6 +216,20 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
         MUser selectCond = new MUser();
         selectCond.setWechatOpenId(inputMsg.getFromUserName());
         List<MUser> userList = mUserMapper.select(selectCond);
+        if (userList.isEmpty()) {
+            MUser mUser = new MUser();
+            mUser.setWechatOpenId(inputMsg.getFromUserName());
+            mUser.setCustomId(generateId(false, 'a'));
+            mUser.setUserType("0");
+            mUser.setCreateId(RzConst.SYS_ADMIN_ID);
+            mUser.setUpdateId(RzConst.SYS_ADMIN_ID);
+            mUserMapper.insert(mUser);
+            String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
+                    inputMsg.getToUserName(), returnTime, "text", "您尚未设置地址！回复【设置地址 姓名 电话 地址】来设置地址吧！");
+            LOGGER.info(msg);
+            response.getOutputStream().write(msg.getBytes("UTF-8"));
+            return;
+        }
 
         MCustomInfo mCustomInfoCond = new MCustomInfo();
         mCustomInfoCond.setCustomId(userList.get(0).getCustomId());

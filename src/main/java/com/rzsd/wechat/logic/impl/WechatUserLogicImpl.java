@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 import com.rzsd.wechat.common.constrant.RzConst;
 import com.rzsd.wechat.common.dto.MUser;
 import com.rzsd.wechat.common.mapper.MUserMapper;
+import com.rzsd.wechat.logic.WechatCustomIdLogic;
 import com.rzsd.wechat.logic.WechatUserLogic;
 import com.rzsd.wechat.util.DateUtil;
 import com.rzsd.wechat.util.InputMessage;
@@ -28,6 +29,9 @@ public class WechatUserLogicImpl implements WechatUserLogic {
 
     @Autowired
     private MUserMapper mUserMapper;
+
+    @Autowired
+    private WechatCustomIdLogic wechatCustomIdLogicImpl;
 
     @Override
     public void createUser(InputMessage inputMsg, HttpServletResponse response)
@@ -42,19 +46,27 @@ public class WechatUserLogicImpl implements WechatUserLogic {
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
+
+        // TODO:用户名check
+        // TODO:昵称check
+        // TODO：密码check
+
         // 获取用户信息
         MUser selectCond = new MUser();
         selectCond.setWechatOpenId(inputMsg.getFromUserName());
         List<MUser> userList = mUserMapper.select(selectCond);
+        MUser mUser = new MUser();
         if (userList.isEmpty()) {
-            String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text", "您的微信信息暂未在本平台登录，请取消关注后重新关注。");
-            LOGGER.info(msg);
-            response.getOutputStream().write(msg.getBytes("UTF-8"));
-            return;
+            mUser.setWechatOpenId(inputMsg.getFromUserName());
+            mUser.setCustomId(wechatCustomIdLogicImpl.generateId(false, 'a'));
+            mUser.setUserType("0");
+            mUser.setCreateId(RzConst.SYS_ADMIN_ID);
+            mUser.setUpdateId(RzConst.SYS_ADMIN_ID);
+            mUserMapper.insert(mUser);
+        } else {
+            mUser = userList.get(0);
         }
-        MUser mUser = userList.get(0);
-        if (!StringUtils.isEmpty(userList.get(0).getUserName())) {
+        if (!StringUtils.isEmpty(mUser.getUserName())) {
             String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
                     inputMsg.getToUserName(), returnTime, "text", MessageFormat.format(
                             "您已经创建过账号，可以用{0}和密码直接登录。如果需要重置密码，请回复指令【重置密码 新密码】重置！", userList.get(0).getUserName()));
@@ -75,6 +87,7 @@ public class WechatUserLogicImpl implements WechatUserLogic {
         mUser.setUserName(cmdLst[1]);
         mUser.setNickName(cmdLst[2]);
         mUser.setPassword(MD5Util.toMd5(cmdLst[3]));
+        mUser.setUserType("1");
         mUser.setUpdateId(mUser.getId());
         mUser.setUpdateTime(DateUtil.getCurrentTimestamp());
         mUserMapper.update(mUser);
@@ -99,21 +112,29 @@ public class WechatUserLogicImpl implements WechatUserLogic {
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
+        // TODO：密码check
         // 获取用户信息
         MUser selectCond = new MUser();
         selectCond.setWechatOpenId(inputMsg.getFromUserName());
         List<MUser> userList = mUserMapper.select(selectCond);
+        MUser mUser = new MUser();
         if (userList.isEmpty()) {
+            mUser.setWechatOpenId(inputMsg.getFromUserName());
+            mUser.setCustomId(wechatCustomIdLogicImpl.generateId(false, 'a'));
+            mUser.setUserType("0");
+            mUser.setCreateId(RzConst.SYS_ADMIN_ID);
+            mUser.setUpdateId(RzConst.SYS_ADMIN_ID);
+            mUserMapper.insert(mUser);
             String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text", "您的微信信息暂未在本平台登录，请取消关注后重新关注。");
+                    inputMsg.getToUserName(), returnTime, "text", "您尚未在平台创建账号，请先创建账号。");
             LOGGER.info(msg);
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
-        MUser mUser = userList.get(0);
-        if (StringUtils.isEmpty(userList.get(0).getUserName())) {
+        mUser = userList.get(0);
+        if (StringUtils.isEmpty(mUser.getUserName())) {
             String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text", "您尚未创建过账号，请回复指令【创建账号 zhangsan 张三 passW0rd】创建账号！");
+                    inputMsg.getToUserName(), returnTime, "text", "您尚未在平台创建账号，请先创建账号。");
             LOGGER.info(msg);
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
@@ -130,14 +151,4 @@ public class WechatUserLogicImpl implements WechatUserLogic {
         response.getOutputStream().write(msg.getBytes("UTF-8"));
         return;
     }
-
-    // private static String createMd5String(String str) {
-    // //确定计算方法
-    // MessageDigest md5=MessageDigest.getInstance("MD5");
-    // BASE64Encoder base64en = new BASE64Encoder();
-    // //加密后的字符串
-    // String newstr=base64en.encode(md5.digest(str.getBytes("utf-8")));
-    // return newstr;
-    // }
-
 }

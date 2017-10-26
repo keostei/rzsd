@@ -49,7 +49,7 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
             throws UnsupportedEncodingException, IOException {
         Long returnTime = DateUtil.getCurrentTimestamp().getTime() / 1000;
         String[] cmdLst = inputMsg.getContent().split(" ");
-        if (cmdLst.length != 3 && cmdLst.length != 2) {
+        if (cmdLst.length != 3 && cmdLst.length != 2 && cmdLst.length != 1) {
             // TODO:长度不对
             String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
                     inputMsg.getToUserName(), returnTime, "text", "您的指令格式有误，请按照下面格式发送指令！\n发货 AJKXS1");
@@ -57,76 +57,94 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
+        // 发货
+        // 发货 ANMSX
+        // 发货 ANMSX1
+        // 发货 ANMSX1 A
+        // 发货 ANMSX A
+        // 发货 A
 
         String customCd = null;
+        String proxyCd = null;
+        if (cmdLst.length == 1) {
+            // 默认值，不需要特别设置
+        } else if (cmdLst.length == 2) {
+            if (cmdLst[1].length() == 1) {
+                customCd = null;
+                proxyCd = cmdLst[1].toUpperCase();
+            } else {
+                customCd = cmdLst[1].toUpperCase();
+                proxyCd = null;
+            }
+        } else if (cmdLst.length == 3) {
+            customCd = cmdLst[1].toUpperCase();
+            proxyCd = cmdLst[2].toUpperCase();
+        }
+        if (customCd != null && customCd.length() == 5) {
+            customCd = customCd + "1";
+        }
+        MUser selectCond = new MUser();
+        selectCond.setWechatOpenId(inputMsg.getFromUserName());
+        List<MUser> userList = mUserMapper.select(selectCond);
         MUser mUser = null;
+        // 用户信息没创建的时候，先创建用户，再提示用户设置地址
+        if (userList.isEmpty()) {
+            // 通过代理时，客户编码生成
+            mUser = new MUser();
+            mUser.setWechatOpenId(inputMsg.getFromUserName());
+            if (proxyCd != null) {
+                mUser.setCustomId(wechatCustomIdLogicImpl.generateId(true, proxyCd.charAt(0)));
+            } else {
+                mUser.setCustomId(wechatCustomIdLogicImpl.generateId(false, 'a'));
+            }
+            mUser.setUserType("0");
+            mUser.setCreateId(RzConst.SYS_ADMIN_ID);
+            mUser.setUpdateId(RzConst.SYS_ADMIN_ID);
+            mUserMapper.insert(mUser);
+
+            String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
+                    inputMsg.getToUserName(), returnTime, "text", "您尚未设置收件地址，请先设置收件地址。");
+            LOGGER.info(msg);
+            response.getOutputStream().write(msg.getBytes("UTF-8"));
+            return;
+        }
+
+        mUser = userList.get(0);
         // 通过代理发货的时候，变更客户代码
-        if (cmdLst.length == 3) {
-            // 检索用户信息
-            MUser selectCond = new MUser();
-            selectCond.setWechatOpenId(inputMsg.getFromUserName());
-            List<MUser> userList = mUserMapper.select(selectCond);
-            if (userList.isEmpty()) {
-                String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                        inputMsg.getToUserName(), returnTime, "text", "您的微信信息暂未在本平台登录，请取消关注后重新关注。");
-                LOGGER.info(msg);
-                response.getOutputStream().write(msg.getBytes("UTF-8"));
-                return;
-            }
-            mUser = userList.get(0);
-            if (!mUser.getCustomId().substring(2).equalsIgnoreCase(cmdLst[1].substring(2, 5))) {
-                String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                        inputMsg.getToUserName(), returnTime, "text", "您输入的地址编码有误，请重新输入。您可以通过【查询地址】指令查询地址编码。");
-                LOGGER.info(msg);
-                response.getOutputStream().write(msg.getBytes("UTF-8"));
-                return;
-            }
+        if (proxyCd != null) {
+            // 客户代码跟代理编码不一致时，重新生成客户代码
+            if (!mUser.getCustomId().substring(0, 2).equalsIgnoreCase("Z" + proxyCd)) {
+                String oldCustomId = mUser.getCustomId();
+                // 用户表客户代码更新
+                String customId = wechatCustomIdLogicImpl.generateId(true, proxyCd.charAt(0));
+                mUser.setCustomId(customId);
+                mUser.setUpdateId(mUser.getId());
+                mUser.setUpdateTime(DateUtil.getCurrentTimestamp());
+                mUserMapper.update(mUser);
 
-            String oldCustomId = mUser.getCustomId();
-            String customId = wechatCustomIdLogicImpl.generateId(true, cmdLst[2].charAt(0));
-            mUser.setCustomId(customId);
-            mUser.setUpdateId(mUser.getId());
-            mUser.setUpdateTime(DateUtil.getCurrentTimestamp());
-            mUserMapper.update(mUser);
-
-            MCustomInfo mCustomInfo = new MCustomInfo();
-            mCustomInfo.setCustomId(customId);
-            mCustomInfo.setOldCustomId(oldCustomId);
-            mCustomInfo.setUpdateId(mUser.getId());
-            mCustomInfo.setUpdateTime(DateUtil.getCurrentTimestamp());
-            mCustomInfoMapper.updateCustomId(mCustomInfo);
-            if (cmdLst[1].length() > 5) {
-                customCd = customId + cmdLst[1].substring(5, 6);
-            } else {
-                customCd = customId + "1";
-            }
-            // TODO:流水记录表的客户编码也需要批量更新
-        } else {
-            // 检索用户信息
-            MUser selectCond = new MUser();
-            selectCond.setWechatOpenId(inputMsg.getFromUserName());
-            List<MUser> userList = mUserMapper.select(selectCond);
-            if (userList.isEmpty()) {
-                String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                        inputMsg.getToUserName(), returnTime, "text", "您的微信信息暂未在本平台登录，请取消关注后重新关注。");
-                LOGGER.info(msg);
-                response.getOutputStream().write(msg.getBytes("UTF-8"));
-                return;
-            }
-            mUser = userList.get(0);
-            if (!mUser.getCustomId().equalsIgnoreCase(cmdLst[1].substring(0, 5))) {
-                String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                        inputMsg.getToUserName(), returnTime, "text", "您输入的地址编码有误，请重新输入。您可以通过【查询地址】指令查询地址编码。");
-                LOGGER.info(msg);
-                response.getOutputStream().write(msg.getBytes("UTF-8"));
-                return;
-            }
-            if (cmdLst[1].length() > 5) {
-                customCd = cmdLst[1];
-            } else {
-                customCd = cmdLst[1] + "1";
+                // 客户代码表地址统一更新
+                MCustomInfo mCustomInfo = new MCustomInfo();
+                mCustomInfo.setCustomId(customId);
+                mCustomInfo.setOldCustomId(oldCustomId);
+                mCustomInfo.setUpdateId(mUser.getId());
+                mCustomInfo.setUpdateTime(DateUtil.getCurrentTimestamp());
+                mCustomInfoMapper.updateCustomId(mCustomInfo);
+                customCd = customId + customCd.substring(5);
             }
         }
+        // 检查后三位跟登陆的编码是否一致，不一致则报错
+        if (customCd != null && !mUser.getCustomId().equalsIgnoreCase(customCd.substring(5))) {
+            String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
+                    inputMsg.getToUserName(), returnTime, "text", "您输入的地址编码有误，请重新输入。您可以通过【查询地址】指令查询地址编码。");
+            LOGGER.info(msg);
+            response.getOutputStream().write(msg.getBytes("UTF-8"));
+            return;
+        }
+
+        if (customCd == null) {
+            customCd = mUser.getCustomId() + "1";
+        }
+
         MCustomInfo mCustomInfoCond = new MCustomInfo();
         mCustomInfoCond.setCustomId(customCd.substring(0, 5));
         mCustomInfoCond.setRowNo(customCd.substring(5, 6));
@@ -146,7 +164,7 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
         tInvoice.setName(mCustomInfoLst.get(0).getName());
         tInvoice.setTelNo(mCustomInfoLst.get(0).getTelNo());
         tInvoice.setAddress(mCustomInfoLst.get(0).getAddress());
-        tInvoice.setInvoiceStatus("1");
+        tInvoice.setInvoiceStatus(InvoiceStatus.YUYUE.getCode());
         tInvoice.setCreateId(mUser.getId());
         tInvoice.setUpdateId(mUser.getId());
         tInvoiceMapper.insert(tInvoice);
@@ -171,6 +189,13 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
         List<MUser> userList = mUserMapper.select(selectCond);
         // 用户信息不存在时，提示没有发货记录
         if (userList.isEmpty()) {
+            MUser mUser = new MUser();
+            mUser.setWechatOpenId(inputMsg.getFromUserName());
+            mUser.setCustomId(wechatCustomIdLogicImpl.generateId(false, 'a'));
+            mUser.setUserType("0");
+            mUser.setCreateId(RzConst.SYS_ADMIN_ID);
+            mUser.setUpdateId(RzConst.SYS_ADMIN_ID);
+            mUserMapper.insert(mUser);
             String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
                     inputMsg.getToUserName(), returnTime, "text", "暂时未查询到您的发货记录。");
             LOGGER.info(msg);
