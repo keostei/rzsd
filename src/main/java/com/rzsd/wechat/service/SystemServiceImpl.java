@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.rzsd.wechat.common.dto.MSysParam;
 import com.rzsd.wechat.common.mapper.MSysParamMapper;
@@ -30,6 +31,7 @@ public class SystemServiceImpl implements SystemService {
     }
 
     @Override
+    @Transactional
     public int updateSysParamByKey(String key, String value, HttpServletRequest request) {
         LoginUser loginUser = (LoginUser) request.getSession().getAttribute("LOGIN_USER");
         MSysParam selectCond = new MSysParam();

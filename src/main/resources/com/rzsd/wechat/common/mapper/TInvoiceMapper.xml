@@ -107,9 +107,7 @@
     <select id="getPersonalInvoice" parameterType="tInvoice" resultType="tInvoice">
         SELECT A.*
         FROM `t_invoice` A
-        INNER JOIN `m_user` B 
-        ON LEFT (A.custom_cd, 5) = B.custom_id 
-        WHERE B.id = #{createId}
+        WHERE A.create_id = #{createId}
         <if test="invoiceId != null">
             AND A.invoice_id = #{invoiceId}
         </if>
