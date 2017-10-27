@@ -129,7 +129,11 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
                 mCustomInfo.setUpdateId(mUser.getId());
                 mCustomInfo.setUpdateTime(DateUtil.getCurrentTimestamp());
                 mCustomInfoMapper.updateCustomId(mCustomInfo);
-                customCd = customId + customCd.substring(5);
+                if (customCd != null && customCd.length() > 5) {
+                    customCd = customId + customCd.substring(5);
+                } else {
+                    customCd = customId + "1";
+                }
             }
         }
         // 检查后三位跟登陆的编码是否一致，不一致则报错
