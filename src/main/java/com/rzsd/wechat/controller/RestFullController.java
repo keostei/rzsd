@@ -358,13 +358,13 @@ public class RestFullController {
             throws UnsupportedEncodingException, IOException {
 
         InputMessage inputMsg = new InputMessage();
-        inputMsg.setFromUserName("openId-test=001");
+        inputMsg.setFromUserName("openId-test=003");
         inputMsg.setToUserName("KEOSIMAGE");
-        inputMsg.setContent("创建账号 seuzc SEUZHENGCHAO 001315");
-        // wechatCustomIdLogicImpl.updateCustomInfo(inputMsg, response);
+        inputMsg.setContent("添加地址 张蛋蛋 18720928817 深圳市富土康3号流水线");
+        wechatCustomIdLogicImpl.createCustomInfo(inputMsg, response);
         // wechatInvoiceLogicImpl.createInvoice(inputMsg, response);
         // wechatInvoiceLogicImpl.queryInvoice(inputMsg, response);
-        wechatUserLogicImpl.createUser(inputMsg, response);
+        // wechatUserLogicImpl.createUser(inputMsg, response);
         // wechatHelpLogicImpl.doAppointment(inputMsg, response);
     }
 

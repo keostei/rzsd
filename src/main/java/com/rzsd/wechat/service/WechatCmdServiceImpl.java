@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.rzsd.wechat.common.constrant.RzConst;
 import com.rzsd.wechat.enmu.MsgType;
@@ -47,6 +48,7 @@ public class WechatCmdServiceImpl implements WechatCmdService {
     private WechatHelpLogic wechatHelpLogicImpl;
 
     @Override
+    @Transactional
     public void acceptMessage(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // 处理接收消息
         ServletInputStream in = request.getInputStream();

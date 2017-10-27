@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.rzsd.wechat.common.dto.MCustomInfo;
 import com.rzsd.wechat.common.mapper.MCustomInfoMapper;
@@ -19,6 +20,7 @@ public class UserServiceImpl implements UserService {
     private MCustomInfoMapper mCustomInfoMapper;
 
     @Override
+    @Transactional
     public List<MCustomInfo> getPersonCustomInfo(HttpServletRequest request) {
         LoginUser loginUser = (LoginUser) request.getSession().getAttribute("LOGIN_USER");
         MCustomInfo selectCond = new MCustomInfo();
@@ -37,6 +39,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public int editCustomInfo(MCustomInfo mCustomInfo, HttpServletRequest request) {
         LoginUser loginUser = (LoginUser) request.getSession().getAttribute("LOGIN_USER");
         mCustomInfo.setUpdateId(loginUser.getId());

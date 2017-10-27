@@ -28,7 +28,7 @@
         </if>
     </select>
 
-    <insert id="insert" parameterType="mUser">
+    <insert id="insert" parameterType="mUser" keyProperty="id" useGeneratedKeys="true">
         INSERT
         INTO m_user(
         user_name

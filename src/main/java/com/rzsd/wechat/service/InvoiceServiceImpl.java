@@ -44,6 +44,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional
     public int doConfirm(String invoiceId, HttpServletRequest request) {
         LoginUser loginUser = (LoginUser) request.getSession().getAttribute("LOGIN_USER");
         TInvoice tInvoice = new TInvoice();
@@ -55,6 +56,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional
     public int doReject(String invoiceId, HttpServletRequest request) {
         LoginUser loginUser = (LoginUser) request.getSession().getAttribute("LOGIN_USER");
         TInvoice tInvoice = new TInvoice();
@@ -235,6 +237,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional
     public int editInvoiceData(InvoiceData invoiceDataCond, HttpServletRequest request) {
         LoginUser loginUser = (LoginUser) request.getSession().getAttribute("LOGIN_USER");
 
@@ -275,6 +278,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional
     public int doAppointment(TInvoice tInvoice, HttpServletRequest request) {
         LoginUser loginUser = (LoginUser) request.getSession().getAttribute("LOGIN_USER");
         tInvoice.setInvoiceStatus(InvoiceStatus.YUYUE.getCode());
@@ -285,6 +289,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional
     public int doOnekeyUpdate(String lotNo, HttpServletRequest request) {
         LoginUser loginUser = (LoginUser) request.getSession().getAttribute("LOGIN_USER");
         TInvoiceDetail tInvoiceDetail = new TInvoiceDetail();
