@@ -133,7 +133,7 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
             }
         }
         // 检查后三位跟登陆的编码是否一致，不一致则报错
-        if (customCd != null && !mUser.getCustomId().equalsIgnoreCase(customCd.substring(5))) {
+        if (customCd != null && !mUser.getCustomId().equalsIgnoreCase(customCd.substring(0, 5))) {
             String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
                     inputMsg.getToUserName(), returnTime, "text", "您输入的地址编码有误，请重新输入。您可以通过【查询地址】指令查询地址编码。");
             LOGGER.info(msg);
