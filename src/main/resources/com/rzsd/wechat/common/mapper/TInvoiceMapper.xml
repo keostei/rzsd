@@ -148,6 +148,6 @@
                 AND A.invoice_date <![CDATA[<=]]> str_to_date(#{condInvoiceDateTo}, '%Y-%m-%d')
             </if>
          </where>
-         order by A.invoice_id, B.row_no 
+         order by A.invoice_id desc, B.row_no 
     </select>
 </mapper>

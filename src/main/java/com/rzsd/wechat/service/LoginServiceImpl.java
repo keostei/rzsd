@@ -74,6 +74,7 @@ public class LoginServiceImpl implements LoginService {
         mUser.setUserName(userName);
         mUser.setPassword(password);
         mUser.setNickName(name);
+        mUser.setUserType("1");
         mUser.setUpdateId(mUser.getId());
         mUser.setUpdateTime(DateUtil.getCurrentTimestamp());
         mUserMapper.update(mUser);

@@ -10,7 +10,11 @@ $(function(){
             dataType : "json",
             data : {'userName': $('#txtUserName').val(), 'password' : md5($('#txtPassword').val())},
             onSuccess : function(json) {
-            	window.location.href = '/';
+                var locationHref = '/';
+                if('' != json.optStr) {
+                    locationHref = json.optStr;
+                }
+                window.location.href = locationHref;
             }
         });
         return false;

@@ -13,8 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.rzsd.wechat.common.dto.InvoiceData;
+import com.rzsd.wechat.common.dto.MUser;
 import com.rzsd.wechat.common.dto.TInvoice;
 import com.rzsd.wechat.common.dto.TInvoiceDetail;
+import com.rzsd.wechat.common.mapper.MUserMapper;
 import com.rzsd.wechat.common.mapper.TInvoiceDetailMapper;
 import com.rzsd.wechat.common.mapper.TInvoiceMapper;
 import com.rzsd.wechat.enmu.InvoiceDetailStatus;
@@ -30,6 +32,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     private TInvoiceMapper tInvoiceMappper;
     @Autowired
     private TInvoiceDetailMapper tInvoiceDetailMapper;
+    @Autowired
+    private MUserMapper mUserMapper;
     @Autowired
     private SystemService systemServiceImpl;
 
@@ -113,13 +117,30 @@ public class InvoiceServiceImpl implements InvoiceService {
 
                 TInvoice tInvoice = new TInvoice();
                 tInvoice.setInvoiceId(invoiceId);
-                tInvoice.setInvoiceStatus("4");
+                List<TInvoice> invoiceLst = tInvoiceMappper.select(tInvoice);
+                tInvoice = invoiceLst.get(0);
+                BigDecimal oldTotalWeight = tInvoice.getTotalWeight();
+                tInvoice.setInvoiceStatus(InvoiceStatus.CHUKU.getCode());
                 tInvoice.setTotalWeight(totalWeight);
                 tInvoice.setInvoiceAmountJpy(totalWeight.multiply(new BigDecimal(960)));
                 tInvoice.setInvoiceAmountCny(tInvoice.getInvoiceAmountJpy().multiply(rate));
                 tInvoice.setUpdateId(loginUser.getId());
                 tInvoice.setUpdateTime(DateUtil.getCurrentTimestamp());
                 tInvoiceMappper.update(tInvoice);
+                // 如果重量发生变化，变化的重量差额更新到个人发货总重量
+                if (!BigDecimal.ZERO.equals(totalWeight.subtract(oldTotalWeight))) {
+                    MUser mUser = new MUser();
+                    mUser.setId(tInvoice.getCreateId());
+                    // mUser.setCustomId(tInvoice.getCustomCd().substring(0, 5));
+                    List<MUser> usrLst = mUserMapper.select(mUser);
+                    if (!usrLst.isEmpty()) {
+                        mUser = usrLst.get(0);
+                        mUser.setTotalWeight(mUser.getTotalWeight().add(totalWeight).subtract(oldTotalWeight));
+                        mUser.setUpdateId(loginUser.getId());
+                        mUser.setUpdateTime(DateUtil.getCurrentTimestamp());
+                        mUserMapper.update(mUser);
+                    }
+                }
                 // 更新完之后对合计值清零
                 totalWeight = BigDecimal.ZERO;
                 rowNo = 0;
@@ -144,9 +165,30 @@ public class InvoiceServiceImpl implements InvoiceService {
         if (invoiceId != null) {
             TInvoice tInvoice = new TInvoice();
             tInvoice.setInvoiceId(invoiceId);
+            List<TInvoice> invoiceLst = tInvoiceMappper.select(tInvoice);
+            tInvoice = invoiceLst.get(0);
+            BigDecimal oldTotalWeight = tInvoice.getTotalWeight();
+            tInvoice.setInvoiceStatus(InvoiceStatus.CHUKU.getCode());
+            tInvoice.setTotalWeight(totalWeight);
             tInvoice.setInvoiceAmountJpy(totalWeight.multiply(new BigDecimal(960)));
             tInvoice.setInvoiceAmountCny(tInvoice.getInvoiceAmountJpy().multiply(rate));
+            tInvoice.setUpdateId(loginUser.getId());
+            tInvoice.setUpdateTime(DateUtil.getCurrentTimestamp());
             tInvoiceMappper.update(tInvoice);
+            // 如果重量发生变化，变化的重量差额更新到个人发货总重量
+            if (!BigDecimal.ZERO.equals(totalWeight.subtract(oldTotalWeight))) {
+                MUser mUser = new MUser();
+                mUser.setId(tInvoice.getCreateId());
+                // mUser.setCustomId(tInvoice.getCustomCd().substring(0, 5));
+                List<MUser> usrLst = mUserMapper.select(mUser);
+                if (!usrLst.isEmpty()) {
+                    mUser = usrLst.get(0);
+                    mUser.setTotalWeight(mUser.getTotalWeight().add(totalWeight).subtract(oldTotalWeight));
+                    mUser.setUpdateId(loginUser.getId());
+                    mUser.setUpdateTime(DateUtil.getCurrentTimestamp());
+                    mUserMapper.update(mUser);
+                }
+            }
             // 更新完之后对合计值清零
             totalWeight = BigDecimal.ZERO;
             rowNo = 0;
@@ -246,6 +288,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         TInvoice tInvoice = new TInvoice();
         tInvoice.setInvoiceId(new BigInteger(invoiceDataCond.getInvoiceId()));
+        List<TInvoice> invoiceLst = tInvoiceMappper.select(tInvoice);
+        tInvoice = invoiceLst.get(0);
+        BigDecimal oldTotalWeight = tInvoice.getTotalWeight();
         tInvoice.setTotalWeight(invoiceDataCond.getTotalWeight());
         tInvoice.setInvoiceAmountJpy(new BigDecimal(invoiceDataCond.getInvoiceAmountJpy()));
         tInvoice.setInvoiceAmountCny(tInvoice.getInvoiceAmountJpy().multiply(rate));
@@ -256,6 +301,25 @@ public class InvoiceServiceImpl implements InvoiceService {
         tInvoice.setUpdateTime(DateUtil.getCurrentTimestamp());
         tInvoiceMappper.update(tInvoice);
 
+        // 如果重量发生变化，变化的重量差额更新到个人发货总重量
+        if (!BigDecimal.ZERO.equals(invoiceDataCond.getTotalWeight().subtract(oldTotalWeight))) {
+            MUser mUser = new MUser();
+            mUser.setId(tInvoice.getCreateId());
+            // mUser.setCustomId(tInvoice.getCustomCd().substring(0, 5));
+            List<MUser> usrLst = mUserMapper.select(mUser);
+            if (!usrLst.isEmpty()) {
+                mUser = usrLst.get(0);
+                mUser.setTotalWeight(
+                        mUser.getTotalWeight().add(invoiceDataCond.getTotalWeight()).subtract(oldTotalWeight));
+                mUser.setUpdateId(loginUser.getId());
+                mUser.setUpdateTime(DateUtil.getCurrentTimestamp());
+                mUserMapper.update(mUser);
+            }
+        }
+
+        if (StringUtils.isEmpty(invoiceDataCond.getDispLotNo())) {
+            return 0;
+        }
         String[] lotNoLst = invoiceDataCond.getDispLotNo().split(",");
         String[] trackingNoLst = invoiceDataCond.getDispTrackingNo().split(",");
         String[] weightLst = invoiceDataCond.getDispWeight().split(",");

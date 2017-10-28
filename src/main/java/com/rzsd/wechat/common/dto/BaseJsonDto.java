@@ -12,6 +12,7 @@ public class BaseJsonDto implements Serializable {
     private boolean isFail;
     private String msgId;
     private String message;
+    private String optStr;
 
     public boolean isFail() {
         return isFail;
@@ -35,6 +36,14 @@ public class BaseJsonDto implements Serializable {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getOptStr() {
+        return optStr;
+    }
+
+    public void setOptStr(String optStr) {
+        this.optStr = optStr;
     }
 
 }

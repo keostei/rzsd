@@ -212,7 +212,7 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
         tInvoiceCond.setDelFlg("0");
         tInvoiceCond.setCreateId(mUser.getId());
         tInvoiceCond.setOrderByStr(" invoice_date DESC ");
-        tInvoiceCond.setLimitCnt(2L);
+        tInvoiceCond.setLimitCnt(3L);
         List<TInvoice> invoiceLst = tInvoiceMapper.select(tInvoiceCond);
         if (invoiceLst.isEmpty()) {
             String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
@@ -223,7 +223,7 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("系统中查询到您最近两次发货记录是：");
+        sb.append("系统中查询到您最近三次发货记录是：");
         for (TInvoice tInvoice : invoiceLst) {
             sb.append("\n==========");
             sb.append("\n取件日期：").append(DateUtil.format(tInvoice.getInvoiceDate()));

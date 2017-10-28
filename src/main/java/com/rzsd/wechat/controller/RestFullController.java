@@ -39,6 +39,7 @@ import com.rzsd.wechat.common.dto.InvoiceData;
 import com.rzsd.wechat.common.dto.MCustomInfo;
 import com.rzsd.wechat.common.dto.TInvoice;
 import com.rzsd.wechat.entity.InvoiceDeliver;
+import com.rzsd.wechat.entity.LoginUser;
 import com.rzsd.wechat.exception.BussinessException;
 import com.rzsd.wechat.form.ImportDataForm;
 import com.rzsd.wechat.logic.WechatCustomIdLogic;
@@ -90,6 +91,16 @@ public class RestFullController {
         BaseJsonDto result = new BaseJsonDto();
         boolean authRes = loginServiceImpl.doAuth(request.getParameter("userName"), request.getParameter("password"),
                 request);
+        LoginUser loginUser = (LoginUser) request.getSession().getAttribute("LOGIN_USER");
+        if (loginUser != null) {
+            if ("3".equals(loginUser.getUserType())) {
+                result.setOptStr("/system");
+            } else if ("2".equals(loginUser.getUserType())) {
+                result.setOptStr("/confirm");
+            } else {
+                result.setOptStr("/");
+            }
+        }
         result.setFail(!authRes);
         return result;
     }
