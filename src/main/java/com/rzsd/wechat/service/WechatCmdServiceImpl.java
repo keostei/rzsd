@@ -20,6 +20,7 @@ import com.rzsd.wechat.enmu.MsgType;
 import com.rzsd.wechat.logic.WechatCustomIdLogic;
 import com.rzsd.wechat.logic.WechatHelpLogic;
 import com.rzsd.wechat.logic.WechatInvoiceLogic;
+import com.rzsd.wechat.logic.WechatQuickLogic;
 import com.rzsd.wechat.logic.WechatSubscribeLogic;
 import com.rzsd.wechat.logic.WechatUnSubscribeLogic;
 import com.rzsd.wechat.logic.WechatUserLogic;
@@ -46,6 +47,8 @@ public class WechatCmdServiceImpl implements WechatCmdService {
     private WechatInvoiceLogic wechatInvoiceLogicImpl;
     @Autowired
     private WechatHelpLogic wechatHelpLogicImpl;
+    @Autowired
+    private WechatQuickLogic wechatQuickLogicImpl;
 
     @Override
     @Transactional
@@ -90,6 +93,10 @@ public class WechatCmdServiceImpl implements WechatCmdService {
             LOGGER.info("消息创建时间：" + inputMsg.getCreateTime() + new Date(createTime * 1000l));
             LOGGER.info("消息内容：" + inputMsg.getContent());
             LOGGER.info("消息Id：" + inputMsg.getMsgId());
+            // 快速指令
+            if (wechatQuickLogicImpl.execute(inputMsg, response)) {
+                return;
+            }
             if (inputMsg.getContent().startsWith("添加地址")) {
                 wechatCustomIdLogicImpl.createCustomInfo(inputMsg, response);
                 return;

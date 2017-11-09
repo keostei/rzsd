@@ -1,6 +1,7 @@
 package com.rzsd.wechat.logic.impl;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import com.rzsd.wechat.common.constrant.RzConst;
 import com.rzsd.wechat.common.dto.MUser;
 import com.rzsd.wechat.common.mapper.MUserMapper;
+import com.rzsd.wechat.context.ChatContextInstance;
 import com.rzsd.wechat.logic.WechatCustomIdLogic;
 import com.rzsd.wechat.logic.WechatSubscribeLogic;
 import com.rzsd.wechat.util.DateUtil;
@@ -38,9 +40,9 @@ public class WechatSubscribeLogicImpl implements WechatSubscribeLogic {
         str.append("<CreateTime>" + returnTime + "</CreateTime>");
         str.append("<MsgType><![CDATA[text]]></MsgType>");
         str.append(
-                "<Content><![CDATA[那一年，风华正茂；\n那一年，我们一起端起相机记录青春！\n<a href='http://122.112.229.36'>KeosImage团队</a>，欢迎您回来！]]></Content>");
+                "<Content><![CDATA[欢迎关注XXXX；您的客户编码是{0}，请牢记！\n现在您可以回复下面数字快速操作。\n1.添加地址\n2.发货\n3.查询发货记录\n您也可以回复\"更多\"查看更多指令。]]></Content>");
         str.append("</xml>");
-        LOGGER.info(str.toString());
+        String msg = null;
         try {
             MUser mUser = new MUser();
             // 先跟根据OpenId检索该用户之前是否关注过，如果关注过恢复用户删除flg
@@ -52,6 +54,7 @@ public class WechatSubscribeLogicImpl implements WechatSubscribeLogic {
                 mUser.setCreateId(RzConst.SYS_ADMIN_ID);
                 mUser.setUpdateId(RzConst.SYS_ADMIN_ID);
                 mUserMapper.insert(mUser);
+                msg = MessageFormat.format(str.toString(), mUser.getCustomId());
                 LOGGER.info("创建新用户：" + mUser.getCustomId());
             } else {
                 mUser = mUserOldLst.get(0);
@@ -64,9 +67,11 @@ public class WechatSubscribeLogicImpl implements WechatSubscribeLogic {
                 mUser.setUpdateTime(DateUtil.getCurrentTimestamp());
                 mUser.setUpdateId(RzConst.SYS_ADMIN_ID);
                 mUserMapper.update(mUser);
+                msg = MessageFormat.format(str.toString(), mUser.getCustomId());
                 LOGGER.info("取消关注用户重新关注：" + mUser.getCustomId());
             }
-            response.getOutputStream().write(str.toString().getBytes("UTF-8"));
+            ChatContextInstance.newInstance(inputMsg.getFromUserName());
+            response.getOutputStream().write(msg.getBytes("UTF-8"));
         } catch (IOException e) {
             e.printStackTrace();
             LOGGER.error("post exception.");

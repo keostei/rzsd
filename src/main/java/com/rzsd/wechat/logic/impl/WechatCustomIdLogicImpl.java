@@ -41,11 +41,9 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
         while (true) {
             sb = new StringBuilder();
             if (isProxy) {
-                sb.append('Z');
                 sb.append(proxyCd);
             } else {
-                sb.append(CHAR_ARR[(new Random()).nextInt(CHAR_ARR.length - 1)]);
-                sb.append(CHAR_ARR[(new Random()).nextInt(CHAR_ARR.length)]);
+                sb.append('Z');
             }
             sb.append(CHAR_ARR[(new Random()).nextInt(CHAR_ARR.length)]);
             sb.append(CHAR_ARR[(new Random()).nextInt(CHAR_ARR.length)]);
@@ -120,7 +118,10 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
                 returnTime, "text",
                 "地址添加成功，客户编号是：\n【" + mCustomInfo.getCustomId() + mCustomInfo.getRowNo() + "】\n收件人："
                         + mCustomInfo.getName() + "\n电话号码：" + mCustomInfo.getTelNo() + "\n地址："
-                        + mCustomInfo.getAddress());
+                        + mCustomInfo.getAddress()
+                        + "\n您可以使用下列指令快速操作：\n2.发货\n3.查询发货记录\n4.查询已设置收件地址\n您也可以回复\"更多\"查看更多指令。");
+        response.getOutputStream().write(msg.getBytes("UTF-8"));
+
         LOGGER.info(msg);
         response.getOutputStream().write(msg.getBytes("UTF-8"));
         return;
