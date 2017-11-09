@@ -80,7 +80,7 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
             customCd = cmdLst[1].toUpperCase();
             proxyCd = cmdLst[2].toUpperCase();
         }
-        if (customCd != null && customCd.length() == 5) {
+        if (customCd != null && customCd.length() == 4) {
             customCd = customCd + "1";
         }
         MUser selectCond = new MUser();
@@ -113,7 +113,7 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
         // 通过代理发货的时候，变更客户代码
         if (proxyCd != null) {
             // 客户代码跟代理编码不一致时，重新生成客户代码
-            if (!mUser.getCustomId().substring(0, 2).equalsIgnoreCase("Z" + proxyCd)) {
+            if (mUser.getCustomId().substring(0, 2).equalsIgnoreCase("Z" + proxyCd)) {
                 String oldCustomId = mUser.getCustomId();
                 // 用户表客户代码更新
                 String customId = wechatCustomIdLogicImpl.generateId(true, proxyCd.charAt(0));
@@ -129,15 +129,15 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
                 mCustomInfo.setUpdateId(mUser.getId());
                 mCustomInfo.setUpdateTime(DateUtil.getCurrentTimestamp());
                 mCustomInfoMapper.updateCustomId(mCustomInfo);
-                if (customCd != null && customCd.length() > 5) {
-                    customCd = customId + customCd.substring(5);
+                if (customCd != null && customCd.length() > 4) {
+                    customCd = customId + customCd.substring(4);
                 } else {
                     customCd = customId + "1";
                 }
             }
         }
         // 检查后三位跟登陆的编码是否一致，不一致则报错
-        if (customCd != null && !mUser.getCustomId().equalsIgnoreCase(customCd.substring(0, 5))) {
+        if (customCd != null && !mUser.getCustomId().equalsIgnoreCase(customCd.substring(0, 4))) {
             String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
                     inputMsg.getToUserName(), returnTime, "text", "您输入的地址编码有误，请重新输入。您可以通过【查询地址】指令查询地址编码。");
             LOGGER.info(msg);
@@ -150,8 +150,8 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
         }
 
         MCustomInfo mCustomInfoCond = new MCustomInfo();
-        mCustomInfoCond.setCustomId(customCd.substring(0, 5));
-        mCustomInfoCond.setRowNo(customCd.substring(5, 6));
+        mCustomInfoCond.setCustomId(customCd.substring(0, 4));
+        mCustomInfoCond.setRowNo(customCd.substring(4));
         mCustomInfoCond.setOrderByStr(" row_no DESC ");
         List<MCustomInfo> mCustomInfoLst = mCustomInfoMapper.select(mCustomInfoCond);
         if (mCustomInfoLst.isEmpty()) {

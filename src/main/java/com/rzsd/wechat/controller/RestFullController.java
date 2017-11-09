@@ -377,19 +377,19 @@ public class RestFullController {
         InputMessage inputMsg = new InputMessage();
         inputMsg.setFromUserName("openId-test-1108001");
         inputMsg.setToUserName("KEOSIMAGE");
-        inputMsg.setContent("1");
+        inputMsg.setContent("2");
         // wechatCustomIdLogicImpl.createCustomInfo(inputMsg, response);
         // wechatInvoiceLogicImpl.createInvoice(inputMsg, response);
         // wechatInvoiceLogicImpl.queryInvoice(inputMsg, response);
         // wechatUserLogicImpl.createUser(inputMsg, response);
         // wechatHelpLogicImpl.doAppointment(inputMsg, response);
         wechatQuickLogicImpl.execute(inputMsg, response);
-        inputMsg.setContent("郑超");
+        inputMsg.setContent("666");
         wechatQuickLogicImpl.execute(inputMsg, response);
-        inputMsg.setContent("13951741096");
-        wechatQuickLogicImpl.execute(inputMsg, response);
-        inputMsg.setContent("江苏省南京市奥体大街69号新城科技园5栋5楼");
-        wechatQuickLogicImpl.execute(inputMsg, response);
+        // inputMsg.setContent("13951741096");
+        // wechatQuickLogicImpl.execute(inputMsg, response);
+        // inputMsg.setContent("江苏省南京市奥体大街69号新城科技园5栋5楼");
+        // wechatQuickLogicImpl.execute(inputMsg, response);
     }
 
     @ExceptionHandler(BussinessException.class) // (1)

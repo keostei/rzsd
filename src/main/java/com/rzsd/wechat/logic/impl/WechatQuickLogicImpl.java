@@ -96,12 +96,12 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
             String customInfoMsg = "【{0}】\n姓名：{1}\n电话号码：{2}\n收件地址：{3}\n";
             for (MCustomInfo info : mCustomInfoLst) {
                 sb.append(MessageFormat.format(customInfoMsg,
-                        info.getRowNo().equals("1") ? "【默认】" : "" + info.getCustomId() + info.getRowNo(),
+                        (info.getRowNo().equals("1") ? "【默认】" : "") + info.getCustomId() + info.getRowNo(),
                         info.getName(), info.getTelNo(), info.getAddress()));
             }
 
             String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text", "请回复发货地址编号，默认地址发货直接回复666。");
+                    inputMsg.getToUserName(), returnTime, "text", "请回复发货地址编号，默认地址发货直接回复666。\n" + sb.toString());
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return true;
         }
