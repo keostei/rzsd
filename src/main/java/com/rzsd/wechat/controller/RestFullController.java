@@ -45,6 +45,7 @@ import com.rzsd.wechat.form.ImportDataForm;
 import com.rzsd.wechat.logic.WechatCustomIdLogic;
 import com.rzsd.wechat.logic.WechatHelpLogic;
 import com.rzsd.wechat.logic.WechatInvoiceLogic;
+import com.rzsd.wechat.logic.WechatQuickLogic;
 import com.rzsd.wechat.logic.WechatSubscribeLogic;
 import com.rzsd.wechat.logic.WechatUserLogic;
 import com.rzsd.wechat.service.InvoiceService;
@@ -69,6 +70,8 @@ public class RestFullController {
     private WechatSubscribeLogic wechatSubscribeLogicImpl;
     @Autowired
     private WechatCustomIdLogic wechatCustomIdLogicImpl;
+    @Autowired
+    private WechatQuickLogic wechatQuickLogicImpl;
     @Autowired
     private InvoiceService invoiceServiceImpl;
     @Autowired
@@ -374,13 +377,19 @@ public class RestFullController {
         InputMessage inputMsg = new InputMessage();
         inputMsg.setFromUserName("openId-test-1108001");
         inputMsg.setToUserName("KEOSIMAGE");
-        inputMsg.setContent("添加地址 张蛋蛋 18720928817 深圳市富土康3号流水线");
+        inputMsg.setContent("1");
         // wechatCustomIdLogicImpl.createCustomInfo(inputMsg, response);
         // wechatInvoiceLogicImpl.createInvoice(inputMsg, response);
         // wechatInvoiceLogicImpl.queryInvoice(inputMsg, response);
         // wechatUserLogicImpl.createUser(inputMsg, response);
         // wechatHelpLogicImpl.doAppointment(inputMsg, response);
-        wechatSubscribeLogicImpl.execute(inputMsg, response);
+        wechatQuickLogicImpl.execute(inputMsg, response);
+        inputMsg.setContent("郑超");
+        wechatQuickLogicImpl.execute(inputMsg, response);
+        inputMsg.setContent("13951741096");
+        wechatQuickLogicImpl.execute(inputMsg, response);
+        inputMsg.setContent("江苏省南京市奥体大街69号新城科技园5栋5楼");
+        wechatQuickLogicImpl.execute(inputMsg, response);
     }
 
     @ExceptionHandler(BussinessException.class) // (1)

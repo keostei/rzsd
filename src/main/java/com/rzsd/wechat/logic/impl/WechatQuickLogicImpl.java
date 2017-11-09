@@ -137,7 +137,7 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
             return true;
         }
 
-        if (TYPE_ADD_ADDRESS.equals(inputMsg.getContent())) {
+        if (TYPE_ADD_ADDRESS.equals(chatContextDto.getType())) {
             if (StringUtils.isEmpty(chatContextDto.getWord1())) {
                 if (!CheckUtil.isLengthValid(inputMsg.getContent(), 10)) {
                     String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
@@ -180,7 +180,7 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
                     response.getOutputStream().write(msg.getBytes("UTF-8"));
                     return true;
                 }
-
+                ChatContextInstance.setWord3(openId, inputMsg.getContent());
                 String cmd = "添加地址 " + chatContextDto.getWord1().replace(" ", "") + " "
                         + chatContextDto.getWord2().replace(" ", "") + " " + chatContextDto.getWord3().replace(" ", "");
                 inputMsg.setContent(cmd);
@@ -197,7 +197,7 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
             return true;
 
         }
-        if (TYPE_APPLY.equals(inputMsg.getContent())) {
+        if (TYPE_APPLY.equals(chatContextDto.getType())) {
             String cmd = null;
             if ("666".equals(inputMsg.getContent())) {
                 cmd = "发货";
