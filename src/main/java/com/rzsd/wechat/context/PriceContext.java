@@ -78,7 +78,7 @@ public class PriceContext {
             return weight.multiply(price);
         }
         if (new BigDecimal("-1").compareTo(mUser.getPrice()) != 0) {
-            return weight.multiply(price);
+            return weight.multiply(mUser.getPrice());
         }
         PriceContextDto matchedDto = null;
         for (PriceContextDto dto : getPriceContextInstance()) {
