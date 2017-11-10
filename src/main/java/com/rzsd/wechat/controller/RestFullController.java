@@ -218,6 +218,9 @@ public class RestFullController {
 
             invoiceDeliver.setTrackingNo(ExcelReaderUtil.getCellValue(row, 8));
             invoiceDeliver.setWeight(new BigDecimal(ExcelReaderUtil.getCellValue(row, 9)));
+            if (!StringUtils.isEmpty(ExcelReaderUtil.getCellValue(row, 10))) {
+                invoiceDeliver.setPrice(new BigDecimal(ExcelReaderUtil.getCellValue(row, 10)));
+            }
             invoiceDeliverLst.add(invoiceDeliver);
             rowNum++;
         }
@@ -345,7 +348,7 @@ public class RestFullController {
                 row.getCell(5).setCellValue(invoice.getAddress());
                 row.getCell(6).setCellValue("4：已出库");
             }
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 11; i++) {
                 if (row.getCell(i) == null) {
                     row.createCell(i).setCellStyle(style);
                 } else {
@@ -354,7 +357,7 @@ public class RestFullController {
             }
         }
 
-        xssfWorkbook.setPrintArea(0, 0, 9, 0, rowNo);
+        xssfWorkbook.setPrintArea(0, 0, 10, 0, rowNo);
         try {
             FileOutputStream fos = new FileOutputStream(newFile);
             xssfWorkbook.setForceFormulaRecalculation(true);

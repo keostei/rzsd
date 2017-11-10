@@ -6,9 +6,11 @@ import com.rzsd.wechat.common.dto.MSysParam;
 
 public interface MSysParamMapper {
 
-	List<MSysParam> select(MSysParam selectCond);
+    List<MSysParam> select(MSysParam selectCond);
 
-	int insert(MSysParam mSysParam);
+    List<MSysParam> selectPriceParam(MSysParam selectCond);
 
-	int update(MSysParam mSysParam);
+    int insert(MSysParam mSysParam);
+
+    int update(MSysParam mSysParam);
 }

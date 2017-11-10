@@ -3,6 +3,11 @@ $(document).ready(function(){
 });
 
 $(function(){
+
+    $('#btnConfirmApply').click(function(){
+        window.location.href = '/confirm';
+        false;
+    });
     $('#btnDownloadCustomInfo').click(function(){
         doAjax({
             url : 'rest/system/invoice_output',

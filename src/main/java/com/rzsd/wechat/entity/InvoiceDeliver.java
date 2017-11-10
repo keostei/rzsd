@@ -23,6 +23,7 @@ public class InvoiceDeliver implements Serializable {
     private BigDecimal totalWeight;
     private BigDecimal invoiceAmountJpy;
     private BigDecimal invoiceAmountCny;
+    private BigDecimal price;
     private String logNo;
     private String trackingNo;
     private String importResult;
@@ -121,6 +122,14 @@ public class InvoiceDeliver implements Serializable {
 
     public void setInvoiceAmountCny(BigDecimal invoiceAmountCny) {
         this.invoiceAmountCny = invoiceAmountCny;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public String getLogNo() {

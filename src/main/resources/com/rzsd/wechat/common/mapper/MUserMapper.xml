@@ -16,6 +16,7 @@
         <if test="userType != null">and user_type = #{userType}</if>
         <if test="totalWeight != null">and total_weight = #{totalWeight}</if>
         <if test="userLever != null">and user_lever = #{userLever}</if>
+        <if test="price != null">and price = #{price}</if>
         <if test="delFlg != null">and del_flg = #{delFlg}</if>
         <if test="createTime != null">and create_time = #{createTime}</if>
         <if test="createId != null">and create_id = #{createId}</if>
@@ -39,6 +40,7 @@
         <if test="userType != null">, user_type</if>
         <if test="totalWeight != null">, total_weight</if>
         <if test="userLever != null">, user_lever</if>
+        <if test="price != null">, price</if>
         <if test="delFlg != null">, del_flg</if>
         <if test="createId != null">, create_id</if>
         <if test="updateId != null">, update_id</if>
@@ -52,6 +54,7 @@
         <if test="userType != null">, #{userType}</if>
         <if test="totalWeight != null">, #{totalWeight}</if>
         <if test="userLever != null">, #{userLever}</if>
+        <if test="price != null">, #{price}</if>
         <if test="delFlg != null">, #{delFlg}</if>
         <if test="createId != null">, #{createId}</if>
         <if test="updateId != null">, #{updateId}</if>
@@ -71,6 +74,7 @@
         <if test="userType != null">, user_type = #{userType}</if>
         <if test="totalWeight != null">, total_weight = #{totalWeight}</if>
         <if test="userLever != null">, user_lever = #{userLever}</if>
+        <if test="price != null">, price = #{price}</if>
         <if test="delFlg != null">, del_flg = #{delFlg}</if>
         <if test="createTime != null">, create_time = #{createTime}</if>
         <if test="createId != null">, create_id = #{createId}</if>

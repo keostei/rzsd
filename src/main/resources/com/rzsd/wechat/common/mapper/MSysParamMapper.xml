@@ -21,6 +21,15 @@
         </if>
     </select>
 
+    <select id="selectPriceParam" parameterType="mSysParam" resultType="mSysParam">
+        select *
+        from m_sys_param
+        where
+        1=1
+            and param_name like CONCAT(#{paramName},'%')
+        ORDER BY param_name ASC
+    </select>
+
     <insert id="insert" parameterType="mSysParam">
         INSERT
         INTO m_sys_param(

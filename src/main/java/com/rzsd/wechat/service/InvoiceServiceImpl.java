@@ -19,6 +19,7 @@ import com.rzsd.wechat.common.dto.TInvoiceDetail;
 import com.rzsd.wechat.common.mapper.MUserMapper;
 import com.rzsd.wechat.common.mapper.TInvoiceDetailMapper;
 import com.rzsd.wechat.common.mapper.TInvoiceMapper;
+import com.rzsd.wechat.context.PriceContext;
 import com.rzsd.wechat.enmu.InvoiceDetailStatus;
 import com.rzsd.wechat.enmu.InvoiceStatus;
 import com.rzsd.wechat.entity.InvoiceDeliver;
@@ -36,6 +37,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     private MUserMapper mUserMapper;
     @Autowired
     private SystemService systemServiceImpl;
+    @Autowired
+    private PriceContext priceContext;
 
     @Override
     public List<TInvoice> getConfirmLst() {
@@ -110,6 +113,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .divide(new BigDecimal("100"));
         BigInteger invoiceId = null;
         BigDecimal totalWeight = BigDecimal.ZERO;
+        BigDecimal price = null;
         int rowNo = 0;
         for (InvoiceDeliver invoiceDeliver : invoiceDeliverLst) {
             // invoiceId发生变化时，对流水表进行更新
@@ -122,7 +126,8 @@ public class InvoiceServiceImpl implements InvoiceService {
                 BigDecimal oldTotalWeight = tInvoice.getTotalWeight();
                 tInvoice.setInvoiceStatus(InvoiceStatus.CHUKU.getCode());
                 tInvoice.setTotalWeight(totalWeight);
-                tInvoice.setInvoiceAmountJpy(totalWeight.multiply(new BigDecimal(960)));
+                tInvoice.setInvoiceAmountJpy(
+                        priceContext.calcPrice(tInvoice.getCreateId(), totalWeight, price, loginUser.getId()));
                 tInvoice.setInvoiceAmountCny(tInvoice.getInvoiceAmountJpy().multiply(rate));
                 tInvoice.setUpdateId(loginUser.getId());
                 tInvoice.setUpdateTime(DateUtil.getCurrentTimestamp());
@@ -143,6 +148,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 }
                 // 更新完之后对合计值清零
                 totalWeight = BigDecimal.ZERO;
+                price = null;
                 rowNo = 0;
             }
 
@@ -159,6 +165,9 @@ public class InvoiceServiceImpl implements InvoiceService {
                 tInvoiceDetailMapper.insert(tInvoiceDetail);
             }
             invoiceId = invoiceDeliver.getInvoiceId();
+            if (invoiceDeliver.getPrice() != null) {
+                price = invoiceDeliver.getPrice();
+            }
             totalWeight = totalWeight.add(invoiceDeliver.getWeight());
         }
         // 对最后一组invoice数据进行更新
@@ -170,7 +179,8 @@ public class InvoiceServiceImpl implements InvoiceService {
             BigDecimal oldTotalWeight = tInvoice.getTotalWeight();
             tInvoice.setInvoiceStatus(InvoiceStatus.CHUKU.getCode());
             tInvoice.setTotalWeight(totalWeight);
-            tInvoice.setInvoiceAmountJpy(totalWeight.multiply(new BigDecimal(960)));
+            tInvoice.setInvoiceAmountJpy(
+                    priceContext.calcPrice(tInvoice.getCreateId(), totalWeight, price, loginUser.getId()));
             tInvoice.setInvoiceAmountCny(tInvoice.getInvoiceAmountJpy().multiply(rate));
             tInvoice.setUpdateId(loginUser.getId());
             tInvoice.setUpdateTime(DateUtil.getCurrentTimestamp());
