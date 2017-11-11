@@ -98,7 +98,6 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
                 // }
                 inputMsg.setContent("发货");
                 wechatInvoiceLogicImpl.createInvoice(inputMsg, response);
-                ChatContextInstance.removeInstance(openId);
                 return true;
             }
 
