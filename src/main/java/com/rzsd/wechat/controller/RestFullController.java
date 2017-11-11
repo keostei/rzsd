@@ -335,17 +335,17 @@ public class RestFullController {
                 row.createCell(0).setCellValue(String.valueOf(invoice.getInvoiceId()));
                 row.createCell(1).setCellValue(formatter.format(invoice.getInvoiceDate()));
                 row.createCell(2).setCellValue(invoice.getCustomCd());
-                row.createCell(3).setCellValue(invoice.getName());
-                row.createCell(4).setCellValue(invoice.getTelNo());
-                row.createCell(5).setCellValue(invoice.getAddress());
+                row.createCell(3).setCellValue(StringUtils.isEmpty(invoice.getName()) ? "" : invoice.getName());
+                row.createCell(4).setCellValue(StringUtils.isEmpty(invoice.getTelNo()) ? "" : invoice.getTelNo());
+                row.createCell(5).setCellValue(StringUtils.isEmpty(invoice.getAddress()) ? "" : invoice.getAddress());
                 row.createCell(6).setCellValue("4：已出库");
             } else {
                 row.getCell(0).setCellValue(String.valueOf(invoice.getInvoiceId()));
                 row.getCell(1).setCellValue(formatter.format(invoice.getInvoiceDate()));
                 row.getCell(2).setCellValue(invoice.getCustomCd());
-                row.getCell(3).setCellValue(invoice.getName());
-                row.getCell(4).setCellValue(invoice.getTelNo());
-                row.getCell(5).setCellValue(invoice.getAddress());
+                row.getCell(3).setCellValue(StringUtils.isEmpty(invoice.getName()) ? "" : invoice.getName());
+                row.getCell(4).setCellValue(StringUtils.isEmpty(invoice.getTelNo()) ? "" : invoice.getTelNo());
+                row.getCell(5).setCellValue(StringUtils.isEmpty(invoice.getAddress()) ? "" : invoice.getAddress());
                 row.getCell(6).setCellValue("4：已出库");
             }
             for (int i = 0; i < 11; i++) {
