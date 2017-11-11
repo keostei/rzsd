@@ -22,6 +22,7 @@ import com.rzsd.wechat.common.mapper.MCustomInfoMapper;
 import com.rzsd.wechat.common.mapper.MUserMapper;
 import com.rzsd.wechat.common.mapper.TInvoiceDetailMapper;
 import com.rzsd.wechat.common.mapper.TInvoiceMapper;
+import com.rzsd.wechat.context.ChatContextInstance;
 import com.rzsd.wechat.enmu.InvoiceDetailStatus;
 import com.rzsd.wechat.enmu.InvoiceStatus;
 import com.rzsd.wechat.logic.WechatCustomIdLogic;
@@ -154,29 +155,46 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
         mCustomInfoCond.setRowNo(customCd.substring(4));
         mCustomInfoCond.setOrderByStr(" row_no DESC ");
         List<MCustomInfo> mCustomInfoLst = mCustomInfoMapper.select(mCustomInfoCond);
+        boolean hasAddress = true;
         if (mCustomInfoLst.isEmpty()) {
-            String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text", "您输入的地址编码有误，请重新输入。您可以通过【查询地址】指令查询地址编码。");
-            LOGGER.info(msg);
-            response.getOutputStream().write(msg.getBytes("UTF-8"));
-            return;
+            // String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE,
+            // inputMsg.getFromUserName(),
+            // inputMsg.getToUserName(), returnTime, "text",
+            // "您输入的地址编码有误，请重新输入。您可以通过【查询地址】指令查询地址编码。");
+            // LOGGER.info(msg);
+            // response.getOutputStream().write(msg.getBytes("UTF-8"));
+            // return;
+            hasAddress = false;
         }
 
         TInvoice tInvoice = new TInvoice();
         tInvoice.setInvoiceDate(DateUtil.getCurrentTimestamp());
         tInvoice.setCustomCd(customCd);
-        tInvoice.setName(mCustomInfoLst.get(0).getName());
-        tInvoice.setTelNo(mCustomInfoLst.get(0).getTelNo());
-        tInvoice.setAddress(mCustomInfoLst.get(0).getAddress());
+        if (hasAddress) {
+            tInvoice.setName(mCustomInfoLst.get(0).getName());
+            tInvoice.setTelNo(mCustomInfoLst.get(0).getTelNo());
+            tInvoice.setAddress(mCustomInfoLst.get(0).getAddress());
+        }
         tInvoice.setInvoiceStatus(InvoiceStatus.YUYUE.getCode());
         tInvoice.setCreateId(mUser.getId());
         tInvoice.setUpdateId(mUser.getId());
         tInvoiceMapper.insert(tInvoice);
 
-        String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(), inputMsg.getToUserName(),
-                returnTime, "text",
-                MessageFormat.format("发货申请成功！\n日期：{0}\n客户编号：{1}\n收件人：{2}\n电话：{3}\n地址：{4}", tInvoice.getInvoiceDate(),
-                        tInvoice.getCustomCd(), tInvoice.getName(), tInvoice.getTelNo(), tInvoice.getAddress()));
+        String msg = null;
+        if (hasAddress) {
+            msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(), inputMsg.getToUserName(),
+                    returnTime, "text",
+                    MessageFormat.format("发货申请成功！\n日期：{0}\n客户编号：{1}\n收件人：{2}\n电话：{3}\n地址：{4}",
+                            tInvoice.getInvoiceDate(), tInvoice.getCustomCd(), tInvoice.getName(), tInvoice.getTelNo(),
+                            tInvoice.getAddress()));
+        } else {
+            msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(), inputMsg.getToUserName(),
+                    returnTime, "text",
+                    MessageFormat.format("发货申请成功！\n您还没有设置收件信息，请输入收件人姓名：（例如：张三）", tInvoice.getInvoiceDate(),
+                            tInvoice.getCustomCd(), tInvoice.getName(), tInvoice.getTelNo(), tInvoice.getAddress()));
+            ChatContextInstance.newInstance(inputMsg.getFromUserName());
+            ChatContextInstance.setType(inputMsg.getFromUserName(), "1");
+        }
         LOGGER.info(msg);
         response.getOutputStream().write(msg.getBytes("UTF-8"));
         return;

@@ -72,7 +72,7 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
                 mUser.setUpdateId(RzConst.SYS_ADMIN_ID);
                 mUserMapper.insert(mUser);
                 String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                        inputMsg.getToUserName(), returnTime, "text", "您还没有设置收件信息，请输入收件人姓名：（例如：张三）！");
+                        inputMsg.getToUserName(), returnTime, "text", "您还没有设置收件信息，请输入收件人姓名：（例如：张三）");
                 response.getOutputStream().write(msg.getBytes("UTF-8"));
                 ChatContextInstance.newInstance(openId);
                 ChatContextInstance.setType(openId, TYPE_ADD_ADDRESS);
@@ -84,11 +84,21 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
             mCustomInfoCond.setOrderByStr(" row_no ASC ");
             List<MCustomInfo> mCustomInfoLst = mCustomInfoMapper.select(mCustomInfoCond);
             if (mCustomInfoLst.isEmpty()) {
-                String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                        inputMsg.getToUserName(), returnTime, "text", "您还没有设置收件信息，请输入收件人姓名：（例如：张三）！");
-                response.getOutputStream().write(msg.getBytes("UTF-8"));
-                ChatContextInstance.newInstance(openId);
-                ChatContextInstance.setType(openId, TYPE_ADD_ADDRESS);
+                // String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE,
+                // inputMsg.getFromUserName(),
+                // inputMsg.getToUserName(), returnTime, "text", "您还没有设置收件信息，请输入收件人姓名：（例如：张三）");
+                // response.getOutputStream().write(msg.getBytes("UTF-8"));
+                // ChatContextInstance.newInstance(openId);
+                // ChatContextInstance.setType(openId, TYPE_ADD_ADDRESS);
+                // String cmd = null;
+                // if ("666".equals(inputMsg.getContent())) {
+                // cmd = "发货";
+                // } else {
+                // cmd = "发货 " + inputMsg.getContent();
+                // }
+                inputMsg.setContent("发货");
+                wechatInvoiceLogicImpl.createInvoice(inputMsg, response);
+                ChatContextInstance.removeInstance(openId);
                 return true;
             }
 
