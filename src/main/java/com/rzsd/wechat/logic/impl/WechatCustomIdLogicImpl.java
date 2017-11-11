@@ -16,8 +16,10 @@ import org.springframework.stereotype.Component;
 import com.rzsd.wechat.common.constrant.RzConst;
 import com.rzsd.wechat.common.dto.MCustomInfo;
 import com.rzsd.wechat.common.dto.MUser;
+import com.rzsd.wechat.common.dto.TInvoice;
 import com.rzsd.wechat.common.mapper.MCustomInfoMapper;
 import com.rzsd.wechat.common.mapper.MUserMapper;
+import com.rzsd.wechat.common.mapper.TInvoiceMapper;
 import com.rzsd.wechat.logic.WechatCustomIdLogic;
 import com.rzsd.wechat.util.DateUtil;
 import com.rzsd.wechat.util.InputMessage;
@@ -30,6 +32,8 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
     private MUserMapper mUserMapper;
     @Autowired
     private MCustomInfoMapper mCustomInfoMapper;
+    @Autowired
+    private TInvoiceMapper tInvoiceMapper;
 
     private static final char[] CHAR_ARR = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R',
             'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
@@ -113,6 +117,25 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
         mCustomInfo.setCreateId(mUser.getId());
         mCustomInfo.setUpdateId(mUser.getId());
         mCustomInfoMapper.insert(mCustomInfo);
+
+        // 未设置地址发货申请地址不足
+        if ("1".equals(mCustomInfo.getRowNo())) {
+            TInvoice tInvoiceSelectCond = new TInvoice();
+            tInvoiceSelectCond.setCreateId(mUser.getId());
+            tInvoiceSelectCond.setDelFlg("0");
+            List<TInvoice> tInvoiceLst = tInvoiceMapper.select(tInvoiceSelectCond);
+            for (TInvoice tInvoice : tInvoiceLst) {
+                if (tInvoice.getName() != null) {
+                    continue;
+                }
+                tInvoice.setName(mCustomInfo.getName());
+                tInvoice.setTelNo(mCustomInfo.getTelNo());
+                tInvoice.setAddress(mCustomInfo.getAddress());
+                tInvoice.setUpdateTime(DateUtil.getCurrentTimestamp());
+                tInvoice.setUpdateId(mUser.getId());
+                tInvoiceMapper.update(tInvoice);
+            }
+        }
 
         String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(), inputMsg.getToUserName(),
                 returnTime, "text",
