@@ -42,36 +42,17 @@ import com.rzsd.wechat.entity.InvoiceDeliver;
 import com.rzsd.wechat.entity.LoginUser;
 import com.rzsd.wechat.exception.BussinessException;
 import com.rzsd.wechat.form.ImportDataForm;
-import com.rzsd.wechat.logic.WechatCustomIdLogic;
-import com.rzsd.wechat.logic.WechatHelpLogic;
-import com.rzsd.wechat.logic.WechatInvoiceLogic;
-import com.rzsd.wechat.logic.WechatQuickLogic;
-import com.rzsd.wechat.logic.WechatSubscribeLogic;
-import com.rzsd.wechat.logic.WechatUserLogic;
 import com.rzsd.wechat.service.InvoiceService;
 import com.rzsd.wechat.service.LoginService;
 import com.rzsd.wechat.service.SystemService;
 import com.rzsd.wechat.service.UserService;
 import com.rzsd.wechat.util.DateUtil;
 import com.rzsd.wechat.util.ExcelReaderUtil;
-import com.rzsd.wechat.util.InputMessage;
 
 @RestController
 @RequestMapping("/rest")
 public class RestFullController {
 
-    @Autowired
-    private WechatInvoiceLogic wechatInvoiceLogicImpl;
-    @Autowired
-    private WechatUserLogic wechatUserLogicImpl;
-    @Autowired
-    private WechatHelpLogic wechatHelpLogicImpl;
-    @Autowired
-    private WechatSubscribeLogic wechatSubscribeLogicImpl;
-    @Autowired
-    private WechatCustomIdLogic wechatCustomIdLogicImpl;
-    @Autowired
-    private WechatQuickLogic wechatQuickLogicImpl;
     @Autowired
     private InvoiceService invoiceServiceImpl;
     @Autowired
@@ -370,29 +351,6 @@ public class RestFullController {
         BaseJsonDto result = new BaseJsonDto();
         result.setFail(false);
         return result;
-    }
-
-    @RequestMapping("test")
-    @WebAuth
-    public void test(Model model, HttpServletRequest request, HttpServletResponse response)
-            throws UnsupportedEncodingException, IOException {
-
-        InputMessage inputMsg = new InputMessage();
-        inputMsg.setFromUserName("openId-test-1108001");
-        inputMsg.setToUserName("KEOSIMAGE");
-        inputMsg.setContent("2");
-        // wechatCustomIdLogicImpl.createCustomInfo(inputMsg, response);
-        // wechatInvoiceLogicImpl.createInvoice(inputMsg, response);
-        // wechatInvoiceLogicImpl.queryInvoice(inputMsg, response);
-        // wechatUserLogicImpl.createUser(inputMsg, response);
-        // wechatHelpLogicImpl.doAppointment(inputMsg, response);
-        wechatQuickLogicImpl.execute(inputMsg, response);
-        inputMsg.setContent("666");
-        wechatQuickLogicImpl.execute(inputMsg, response);
-        // inputMsg.setContent("13951741096");
-        // wechatQuickLogicImpl.execute(inputMsg, response);
-        // inputMsg.setContent("江苏省南京市奥体大街69号新城科技园5栋5楼");
-        // wechatQuickLogicImpl.execute(inputMsg, response);
     }
 
     @ExceptionHandler(BussinessException.class) // (1)

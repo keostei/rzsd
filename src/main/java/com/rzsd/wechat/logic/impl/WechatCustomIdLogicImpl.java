@@ -20,9 +20,12 @@ import com.rzsd.wechat.common.dto.TInvoice;
 import com.rzsd.wechat.common.mapper.MCustomInfoMapper;
 import com.rzsd.wechat.common.mapper.MUserMapper;
 import com.rzsd.wechat.common.mapper.TInvoiceMapper;
+import com.rzsd.wechat.configuration.PropertiesListenerConfig;
 import com.rzsd.wechat.logic.WechatCustomIdLogic;
+import com.rzsd.wechat.util.CheckUtil;
 import com.rzsd.wechat.util.DateUtil;
 import com.rzsd.wechat.util.InputMessage;
+import com.rzsd.wechat.util.WechatMessageUtil;
 
 @Component
 public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
@@ -63,20 +66,47 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
     @Override
     public void createCustomInfo(InputMessage inputMsg, HttpServletResponse response)
             throws UnsupportedEncodingException, IOException {
-        Long returnTime = DateUtil.getCurrentTimestamp().getTime() / 1000;
         String[] cmdLst = inputMsg.getContent().split(" ");
         if (cmdLst.length != 4) {
-            // TODO:长度不对
-            String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text",
-                    "您的指令格式有误，请按照下面格式发送指令！\n添加地址 张三 13912345678 江苏省南京市玄武区北京东路1号4栋203");
-            LOGGER.info(msg);
+            String msg = WechatMessageUtil.getTextMessage("text.customid.format.error", inputMsg.getFromUserName(),
+                    inputMsg.getToUserName());
+            LOGGER.debug(msg);
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
-        // TODO:姓名check
-        // TODO:电话号码check
-        // TODO:地址check
+        // 姓名check
+        if (!CheckUtil.isLengthValid(cmdLst[1], 10)) {
+            String msg = WechatMessageUtil.getTextMessage("text.customid.name.lenerr", inputMsg.getFromUserName(),
+                    inputMsg.getToUserName());
+            response.getOutputStream().write(msg.getBytes("UTF-8"));
+            return;
+        }
+        // 电话号码check
+        if (!CheckUtil.isValidString(cmdLst[2], CheckUtil.REGEX_NUM)) {
+            String msg = WechatMessageUtil.getTextMessage("text.customid.telno.numerr", inputMsg.getFromUserName(),
+                    inputMsg.getToUserName());
+            response.getOutputStream().write(msg.getBytes("UTF-8"));
+            LOGGER.debug(msg);
+            return;
+        }
+
+        if (!CheckUtil.isLengthValid(cmdLst[2], 13)) {
+            String msg = WechatMessageUtil.getTextMessage("text.customid.telno.lenerr", inputMsg.getFromUserName(),
+                    inputMsg.getToUserName());
+            response.getOutputStream().write(msg.getBytes("UTF-8"));
+            LOGGER.debug(msg);
+            return;
+        }
+
+        // 地址check
+        if (!CheckUtil.isLengthValid(cmdLst[3], 64)) {
+            String msg = WechatMessageUtil.getTextMessage("text.customid.address.lenerr", inputMsg.getFromUserName(),
+                    inputMsg.getToUserName());
+            response.getOutputStream().write(msg.getBytes("UTF-8"));
+            LOGGER.debug(msg);
+            return;
+        }
+
         // 获取用户信息
         MUser selectCond = new MUser();
         selectCond.setWechatOpenId(inputMsg.getFromUserName());
@@ -98,8 +128,8 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
         mCustomInfoCond.setOrderByStr(" row_no DESC ");
         List<MCustomInfo> mCustomInfoLst = mCustomInfoMapper.select(mCustomInfoCond);
         if (mCustomInfoLst.size() >= 3) {
-            String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text", "最多只能设置3个收件人地址");
+            String msg = WechatMessageUtil.getTextMessage("text.customid.address.sizeerr", inputMsg.getFromUserName(),
+                    inputMsg.getToUserName());
             LOGGER.info(msg);
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
@@ -136,17 +166,11 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
                 tInvoiceMapper.update(tInvoice);
             }
         }
-
-        String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(), inputMsg.getToUserName(),
-                returnTime, "text",
-                "地址添加成功，客户编号是：\n【" + mCustomInfo.getCustomId() + mCustomInfo.getRowNo() + "】\n收件人："
-                        + mCustomInfo.getName() + "\n电话号码：" + mCustomInfo.getTelNo() + "\n地址："
-                        + mCustomInfo.getAddress()
-                        + "\n您可以使用下列指令快速操作：\n2.发货\n3.查询发货记录\n4.查询已设置收件地址\n您也可以回复\"更多\"查看更多指令。");
+        String msg = WechatMessageUtil.getTextMessage("text.customid.address.add.success", inputMsg.getFromUserName(),
+                inputMsg.getToUserName(), mCustomInfo.getCustomId() + mCustomInfo.getRowNo(), mCustomInfo.getName(),
+                mCustomInfo.getTelNo(), mCustomInfo.getAddress());
         response.getOutputStream().write(msg.getBytes("UTF-8"));
-
         LOGGER.info(msg);
-        response.getOutputStream().write(msg.getBytes("UTF-8"));
         return;
     }
 
@@ -154,21 +178,46 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
     public void updateCustomInfo(InputMessage inputMsg, HttpServletResponse response)
             throws UnsupportedEncodingException, IOException {
 
-        Long returnTime = DateUtil.getCurrentTimestamp().getTime() / 1000;
         String[] cmdLst = inputMsg.getContent().split(" ");
         if (cmdLst.length != 5) {
-            // TODO:长度不对
-            String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text",
-                    "您的指令格式有误，请按照下面格式发送指令！\n修改地址 AXKJS1 张三 13912345678 江苏省南京市玄武区北京东路1号4栋203");
-            LOGGER.info(msg);
+            String msg = WechatMessageUtil.getTextMessage("text.customid.modify.format.error",
+                    inputMsg.getFromUserName(), inputMsg.getToUserName());
+            LOGGER.debug(msg);
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
-        // TODO:用户编码check
-        // TODO:姓名check
-        // TODO:电话号码check
-        // TODO:地址check
+        // 姓名check
+        if (!CheckUtil.isLengthValid(cmdLst[2], 10)) {
+            String msg = WechatMessageUtil.getTextMessage("text.customid.name.lenerr", inputMsg.getFromUserName(),
+                    inputMsg.getToUserName());
+            response.getOutputStream().write(msg.getBytes("UTF-8"));
+            return;
+        }
+        // 电话号码check
+        if (!CheckUtil.isValidString(cmdLst[3], CheckUtil.REGEX_NUM)) {
+            String msg = WechatMessageUtil.getTextMessage("text.customid.telno.numerr", inputMsg.getFromUserName(),
+                    inputMsg.getToUserName());
+            response.getOutputStream().write(msg.getBytes("UTF-8"));
+            LOGGER.debug(msg);
+            return;
+        }
+
+        if (!CheckUtil.isLengthValid(cmdLst[3], 13)) {
+            String msg = WechatMessageUtil.getTextMessage("text.customid.telno.lenerr", inputMsg.getFromUserName(),
+                    inputMsg.getToUserName());
+            response.getOutputStream().write(msg.getBytes("UTF-8"));
+            LOGGER.debug(msg);
+            return;
+        }
+
+        // 地址check
+        if (!CheckUtil.isLengthValid(cmdLst[4], 64)) {
+            String msg = WechatMessageUtil.getTextMessage("text.customid.address.lenerr", inputMsg.getFromUserName(),
+                    inputMsg.getToUserName());
+            response.getOutputStream().write(msg.getBytes("UTF-8"));
+            LOGGER.debug(msg);
+            return;
+        }
         // 获取用户信息
         MUser selectCond = new MUser();
         selectCond.setWechatOpenId(inputMsg.getFromUserName());
@@ -186,29 +235,27 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
             mUser = userList.get(0);
         }
 
-        if (!mUser.getCustomId().equalsIgnoreCase(cmdLst[1].substring(0, 5))) {
-            String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text",
-                    MessageFormat.format("您需要修改的地址编码【{0}】不正确，请重新输入。如需查询地址编号，请输入指令【查询地址】进行查询。", cmdLst[1]));
-            LOGGER.info(msg);
+        if (!mUser.getCustomId().equalsIgnoreCase(cmdLst[1].substring(0, 4))) {
+            String msg = WechatMessageUtil.getTextMessage("text.customid.modify.customid.notexist",
+                    inputMsg.getFromUserName(), inputMsg.getToUserName());
+            LOGGER.debug(msg);
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
 
         MCustomInfo mCustomInfoCond = new MCustomInfo();
         mCustomInfoCond.setCustomId(mUser.getCustomId());
-        if (cmdLst[1].length() > 5) {
-            mCustomInfoCond.setRowNo(cmdLst[1].substring(5, 6));
+        if (cmdLst[1].length() > 4) {
+            mCustomInfoCond.setRowNo(cmdLst[1].substring(4));
         } else {
             mCustomInfoCond.setRowNo("1");
         }
         mCustomInfoCond.setOrderByStr(" row_no DESC ");
         List<MCustomInfo> mCustomInfoLst = mCustomInfoMapper.select(mCustomInfoCond);
         if (mCustomInfoLst.isEmpty()) {
-            String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text",
-                    MessageFormat.format("您需要修改的地址编码【{0}】尚未设置，请检查后再修改。如需查询地址编号，请输入指令【查询地址】进行查询。", cmdLst[1]));
-            LOGGER.info(msg);
+            String msg = WechatMessageUtil.getTextMessage("text.customid.modify.customid.notexist",
+                    inputMsg.getFromUserName(), inputMsg.getToUserName());
+            LOGGER.debug(msg);
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
@@ -221,12 +268,11 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
         mCustomInfo.setUpdateTime(DateUtil.getCurrentTimestamp());
         mCustomInfoMapper.update(mCustomInfo);
 
-        String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(), inputMsg.getToUserName(),
-                returnTime, "text",
-                "地址修改成功，新地址是：\n【" + mCustomInfo.getCustomId() + mCustomInfo.getRowNo() + "】\n收件人："
-                        + mCustomInfo.getName() + "\n电话号码：" + mCustomInfo.getTelNo() + "\n地址："
-                        + mCustomInfo.getAddress());
-        LOGGER.info(msg);
+        String msg = WechatMessageUtil.getTextMessage("text.customid.address.modify.success",
+                inputMsg.getFromUserName(), inputMsg.getToUserName(),
+                mCustomInfo.getCustomId() + mCustomInfo.getRowNo(), mCustomInfo.getName(), mCustomInfo.getTelNo(),
+                mCustomInfo.getAddress());
+        LOGGER.debug(msg);
         response.getOutputStream().write(msg.getBytes("UTF-8"));
         return;
     }
@@ -235,7 +281,6 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
     public void queryCustomInfo(InputMessage inputMsg, HttpServletResponse response)
             throws UnsupportedEncodingException, IOException {
 
-        Long returnTime = DateUtil.getCurrentTimestamp().getTime() / 1000;
         // 获取用户信息
         MUser selectCond = new MUser();
         selectCond.setWechatOpenId(inputMsg.getFromUserName());
@@ -248,9 +293,9 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
             mUser.setCreateId(RzConst.SYS_ADMIN_ID);
             mUser.setUpdateId(RzConst.SYS_ADMIN_ID);
             mUserMapper.insert(mUser);
-            String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text", "您尚未设置地址！回复【设置地址 姓名 电话 地址】来设置地址吧！");
-            LOGGER.info(msg);
+            String msg = WechatMessageUtil.getTextMessage("text.customid.address.query.notexist",
+                    inputMsg.getFromUserName(), inputMsg.getToUserName());
+            LOGGER.debug(msg);
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
@@ -260,23 +305,23 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
         mCustomInfoCond.setOrderByStr(" row_no ASC ");
         List<MCustomInfo> mCustomInfoLst = mCustomInfoMapper.select(mCustomInfoCond);
         if (mCustomInfoLst.isEmpty()) {
-            String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text", "您尚未设置地址！回复【设置地址 姓名 电话 地址】来设置地址吧！");
-            LOGGER.info(msg);
+            String msg = WechatMessageUtil.getTextMessage("text.customid.address.query.notexist",
+                    inputMsg.getFromUserName(), inputMsg.getToUserName());
+            LOGGER.debug(msg);
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
 
         StringBuilder sb = new StringBuilder();
-        String customInfoMsg = "【{0}】\n姓名：{1}\n电话号码：{2}\n收件地址：{3}\n";
+        String customInfoMsg = PropertiesListenerConfig.getProperty("text.customid.address.query.custominfo");
         for (MCustomInfo info : mCustomInfoLst) {
             sb.append(MessageFormat.format(customInfoMsg, info.getCustomId() + info.getRowNo(), info.getName(),
                     info.getTelNo(), info.getAddress()));
         }
 
-        String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(), inputMsg.getToUserName(),
-                returnTime, "text", "您的地址信息如下\n" + sb.toString());
-        LOGGER.info(msg);
+        String msg = WechatMessageUtil.getTextMessage("text.customid.address.query.result", inputMsg.getFromUserName(),
+                inputMsg.getToUserName(), sb.toString());
+        LOGGER.debug(msg);
         response.getOutputStream().write(msg.getBytes("UTF-8"));
         return;
     }

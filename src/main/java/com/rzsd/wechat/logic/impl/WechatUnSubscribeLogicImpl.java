@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.rzsd.wechat.common.dto.MUser;
 import com.rzsd.wechat.common.mapper.MUserMapper;
@@ -24,6 +25,7 @@ public class WechatUnSubscribeLogicImpl implements WechatUnSubscribeLogic {
     private MUserMapper mUserMapper;
 
     @Override
+    @Transactional
     public void execute(InputMessage inputMsg, HttpServletResponse response) throws IOException {
         try {
             MUser mUser = new MUser();
@@ -33,9 +35,9 @@ public class WechatUnSubscribeLogicImpl implements WechatUnSubscribeLogic {
                 LOGGER.warn("未在数据库中找到该用户信息,微信openId：" + inputMsg.getFromUserName());
             } else {
                 mUser = mUserOldLst.get(0);
-                mUser.setUserName(null);
-                mUser.setPassword(null);
-                mUser.setNickName(null);
+                mUser.setUserName("");
+                mUser.setPassword("");
+                mUser.setNickName("");
                 mUser.setUserType("0");
                 mUser.setDelFlg("1");
                 mUser.setUpdateTime(DateUtil.getCurrentTimestamp());
@@ -45,8 +47,7 @@ public class WechatUnSubscribeLogicImpl implements WechatUnSubscribeLogic {
             }
             response.getOutputStream().write("success".toString().getBytes("UTF-8"));
         } catch (IOException e) {
-            e.printStackTrace();
-            LOGGER.info("post exception.");
+            LOGGER.error("用户取消关注公众号发生异常。", e);
             throw e;
         }
     }

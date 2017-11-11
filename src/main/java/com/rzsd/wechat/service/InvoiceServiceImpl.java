@@ -47,6 +47,17 @@ public class InvoiceServiceImpl implements InvoiceService {
         selectCond.setDelFlg("0");
         selectCond.setOrderByStr(" invoice_date ");
         List<TInvoice> result = tInvoiceMappper.select(selectCond);
+        for (TInvoice tInvoice : result) {
+            if (StringUtils.isEmpty(tInvoice.getName())) {
+                tInvoice.setName("未设置");
+            }
+            if (StringUtils.isEmpty(tInvoice.getTelNo())) {
+                tInvoice.setTelNo("未设置");
+            }
+            if (StringUtils.isEmpty(tInvoice.getAddress())) {
+                tInvoice.setAddress("未设置");
+            }
+        }
         return result;
     }
 

@@ -29,6 +29,7 @@ import com.rzsd.wechat.logic.WechatCustomIdLogic;
 import com.rzsd.wechat.logic.WechatInvoiceLogic;
 import com.rzsd.wechat.util.DateUtil;
 import com.rzsd.wechat.util.InputMessage;
+import com.rzsd.wechat.util.WechatMessageUtil;
 
 @Component
 public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
@@ -51,10 +52,9 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
         Long returnTime = DateUtil.getCurrentTimestamp().getTime() / 1000;
         String[] cmdLst = inputMsg.getContent().split(" ");
         if (cmdLst.length != 3 && cmdLst.length != 2 && cmdLst.length != 1) {
-            // TODO:长度不对
-            String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text", "您的指令格式有误，请按照下面格式发送指令！\n发货 AJKXS1");
-            LOGGER.info(msg);
+            String msg = WechatMessageUtil.getTextMessage("text.tinvoice.add.format.error", inputMsg.getFromUserName(),
+                    inputMsg.getToUserName());
+            LOGGER.debug(msg);
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
@@ -139,9 +139,9 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
         }
         // 检查后三位跟登陆的编码是否一致，不一致则报错
         if (customCd != null && !mUser.getCustomId().equalsIgnoreCase(customCd.substring(0, 4))) {
-            String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text", "您输入的地址编码有误，请重新输入。您可以通过【查询地址】指令查询地址编码。");
-            LOGGER.info(msg);
+            String msg = WechatMessageUtil.getTextMessage("text.tinvoice.add.customcd.error",
+                    inputMsg.getFromUserName(), inputMsg.getToUserName());
+            LOGGER.debug(msg);
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
@@ -157,13 +157,6 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
         List<MCustomInfo> mCustomInfoLst = mCustomInfoMapper.select(mCustomInfoCond);
         boolean hasAddress = true;
         if (mCustomInfoLst.isEmpty()) {
-            // String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE,
-            // inputMsg.getFromUserName(),
-            // inputMsg.getToUserName(), returnTime, "text",
-            // "您输入的地址编码有误，请重新输入。您可以通过【查询地址】指令查询地址编码。");
-            // LOGGER.info(msg);
-            // response.getOutputStream().write(msg.getBytes("UTF-8"));
-            // return;
             hasAddress = false;
         }
 
@@ -182,20 +175,16 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
 
         String msg = null;
         if (hasAddress) {
-            msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(), inputMsg.getToUserName(),
-                    returnTime, "text",
-                    MessageFormat.format("发货申请成功！\n日期：{0}\n客户编号：{1}\n收件人：{2}\n电话：{3}\n地址：{4}",
-                            tInvoice.getInvoiceDate(), tInvoice.getCustomCd(), tInvoice.getName(), tInvoice.getTelNo(),
-                            tInvoice.getAddress()));
+            msg = WechatMessageUtil.getTextMessage("text.tinvoice.add.success", inputMsg.getFromUserName(),
+                    inputMsg.getToUserName(), tInvoice.getInvoiceDate(), tInvoice.getCustomCd(), tInvoice.getName(),
+                    tInvoice.getTelNo(), tInvoice.getAddress());
         } else {
-            msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(), inputMsg.getToUserName(),
-                    returnTime, "text",
-                    MessageFormat.format("发货申请成功！\n您还没有设置收件信息，请输入收件人姓名：（例如：张三）", tInvoice.getInvoiceDate(),
-                            tInvoice.getCustomCd(), tInvoice.getName(), tInvoice.getTelNo(), tInvoice.getAddress()));
+            msg = WechatMessageUtil.getTextMessage("text.tinvoice.add.success.noaddress", inputMsg.getFromUserName(),
+                    inputMsg.getToUserName());
             ChatContextInstance.newInstance(inputMsg.getFromUserName());
             ChatContextInstance.setType(inputMsg.getFromUserName(), "1");
         }
-        LOGGER.info(msg);
+        LOGGER.debug(msg);
         response.getOutputStream().write(msg.getBytes("UTF-8"));
         return;
     }
@@ -218,9 +207,9 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
             mUser.setCreateId(RzConst.SYS_ADMIN_ID);
             mUser.setUpdateId(RzConst.SYS_ADMIN_ID);
             mUserMapper.insert(mUser);
-            String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text", "暂时未查询到您的发货记录。");
-            LOGGER.info(msg);
+            String msg = WechatMessageUtil.getTextMessage("text.tinvoice.query.nodata", inputMsg.getFromUserName(),
+                    inputMsg.getToUserName());
+            LOGGER.debug(msg);
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
@@ -233,9 +222,9 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
         tInvoiceCond.setLimitCnt(3L);
         List<TInvoice> invoiceLst = tInvoiceMapper.select(tInvoiceCond);
         if (invoiceLst.isEmpty()) {
-            String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text", "暂时未查询到您的发货记录。");
-            LOGGER.info(msg);
+            String msg = WechatMessageUtil.getTextMessage("text.tinvoice.query.nodata", inputMsg.getFromUserName(),
+                    inputMsg.getToUserName());
+            LOGGER.debug(msg);
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
