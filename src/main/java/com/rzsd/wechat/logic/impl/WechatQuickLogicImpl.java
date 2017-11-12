@@ -281,8 +281,6 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
             inputMsg.setContent(cmd);
             wechatInvoiceLogicImpl.createInvoice(inputMsg, response);
             ChatContextInstance.removeInstance(openId);
-        } else {
-            return false;
         }
 
         if (TYPE_EDIT_ADDRESS.equals(chatContextDto.getType())) {

@@ -19,6 +19,7 @@ import com.rzsd.wechat.logic.WechatQuickLogic;
 import com.rzsd.wechat.logic.WechatSubscribeLogic;
 import com.rzsd.wechat.logic.WechatUnSubscribeLogic;
 import com.rzsd.wechat.logic.WechatUserLogic;
+import com.rzsd.wechat.service.WechatCmdService;
 import com.rzsd.wechat.util.InputMessage;
 
 @RestController
@@ -39,6 +40,8 @@ public class TestController {
     private WechatCustomIdLogic wechatCustomIdLogicImpl;
     @Autowired
     private WechatQuickLogic wechatQuickLogicImpl;
+    @Autowired
+    private WechatCmdService wechatCmdServiceImpl;
 
     @RequestMapping("test")
     @WebAuth
@@ -46,10 +49,11 @@ public class TestController {
             throws UnsupportedEncodingException, IOException {
 
         InputMessage inputMsg = new InputMessage();
-        inputMsg.setFromUserName("openId-test-1112001");
+        inputMsg.setFromUserName("openId-test-1108001");
         inputMsg.setToUserName("KEOSIMAGE");
-        inputMsg.setContent("2");
-        wechatSubscribeLogicImpl.execute(inputMsg, response);
+        inputMsg.setContent("5");
+
+        // wechatSubscribeLogicImpl.execute(inputMsg, response);
         // wechatUnSubscribeLogicImpl.execute(inputMsg, response);
         // wechatCustomIdLogicImpl.createCustomInfo(inputMsg, response);
         // wechatInvoiceLogicImpl.createInvoice(inputMsg, response);
@@ -57,7 +61,7 @@ public class TestController {
         // wechatUserLogicImpl.createUser(inputMsg, response);
         // wechatHelpLogicImpl.doAppointment(inputMsg, response);
         // wechatQuickLogicImpl.execute(inputMsg, response);
-        // inputMsg.setContent("张三new");
+        // inputMsg.setContent("ZSKA1");
         // wechatQuickLogicImpl.execute(inputMsg, response);
         // inputMsg.setContent("13951741096");
         // wechatQuickLogicImpl.execute(inputMsg, response);
