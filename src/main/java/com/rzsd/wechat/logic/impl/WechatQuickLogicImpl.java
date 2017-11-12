@@ -287,7 +287,8 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
             //
             if (StringUtils.isEmpty(chatContextDto.getWord1())) {
                 if (inputMsg.getContent().length() == 5
-                        && CheckUtil.isValidString(inputMsg.getContent(), CheckUtil.REGEX_ALPHABETA)) {
+                        && CheckUtil.isValidString(inputMsg.getContent().substring(0, 4), CheckUtil.REGEX_ALPHABETA)
+                        && CheckUtil.isValidString(inputMsg.getContent().substring(4), CheckUtil.REGEX_NUM)) {
                     MUser selectCond = new MUser();
                     selectCond.setWechatOpenId(openId);
                     List<MUser> userList = mUserMapper.select(selectCond);
