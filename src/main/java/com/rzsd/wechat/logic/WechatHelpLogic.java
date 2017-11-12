@@ -13,4 +13,7 @@ public interface WechatHelpLogic {
             throws UnsupportedEncodingException, IOException;
 
     void doHelp(InputMessage inputMsg, HttpServletResponse response) throws UnsupportedEncodingException, IOException;
+
+    void doUnknown(InputMessage inputMsg, HttpServletResponse response)
+            throws UnsupportedEncodingException, IOException;
 }

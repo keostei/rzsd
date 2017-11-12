@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.rzsd.wechat.configuration.PropertiesListenerConfig;
 import com.rzsd.wechat.enmu.MsgType;
 import com.rzsd.wechat.logic.WechatCustomIdLogic;
 import com.rzsd.wechat.logic.WechatHelpLogic;
@@ -136,10 +135,7 @@ public class WechatCmdServiceImpl implements WechatCmdService {
                 return;
             }
 
-            LOGGER.warn("无法识别的命令：" + inputMsg.getContent());
-            String msg = PropertiesListenerConfig.getProperty("text.service.error.unknown");
-            LOGGER.debug(msg);
-            response.getOutputStream().write(msg.getBytes("UTF-8"));
+            wechatHelpLogicImpl.doUnknown(inputMsg, response);
             return;
         }
         // 获取并返回多图片消息

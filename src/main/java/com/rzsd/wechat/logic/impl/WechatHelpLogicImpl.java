@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.rzsd.wechat.common.constrant.RzConst;
+import com.rzsd.wechat.configuration.PropertiesListenerConfig;
 import com.rzsd.wechat.logic.WechatHelpLogic;
 import com.rzsd.wechat.util.DateUtil;
 import com.rzsd.wechat.util.InputMessage;
@@ -70,6 +71,15 @@ public class WechatHelpLogicImpl implements WechatHelpLogic {
         response.getOutputStream().write(msg.getBytes("UTF-8"));
         return;
 
+    }
+
+    @Override
+    public void doUnknown(InputMessage inputMsg, HttpServletResponse response)
+            throws UnsupportedEncodingException, IOException {
+        LOGGER.warn("无法识别的命令：" + inputMsg.getContent());
+        String msg = PropertiesListenerConfig.getProperty("text.service.error.unknown");
+        LOGGER.debug(msg);
+        response.getOutputStream().write(msg.getBytes("UTF-8"));
     }
 
 }
