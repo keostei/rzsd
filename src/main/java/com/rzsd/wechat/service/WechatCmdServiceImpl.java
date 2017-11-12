@@ -1,7 +1,6 @@
 package com.rzsd.wechat.service;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -15,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.rzsd.wechat.common.constrant.RzConst;
+import com.rzsd.wechat.configuration.PropertiesListenerConfig;
 import com.rzsd.wechat.enmu.MsgType;
 import com.rzsd.wechat.logic.WechatCustomIdLogic;
 import com.rzsd.wechat.logic.WechatHelpLogic;
@@ -132,15 +131,14 @@ public class WechatCmdServiceImpl implements WechatCmdService {
                 return;
             }
 
-            if (inputMsg.getContent().startsWith("帮助")) {
+            if (inputMsg.getContent().startsWith("帮助") || inputMsg.getContent().startsWith("更多")) {
                 wechatHelpLogicImpl.doHelp(inputMsg, response);
                 return;
             }
 
-            String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(), returnTime, "text",
-                    MessageFormat.format("您发的指令{0}系统暂时无法识别，已转交人工处理！", inputMsg.getContent()));
-            LOGGER.info(msg);
+            LOGGER.warn("无法识别的命令：" + inputMsg.getContent());
+            String msg = PropertiesListenerConfig.getProperty("text.service.error.unknown");
+            LOGGER.debug(msg);
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
