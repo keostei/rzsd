@@ -105,7 +105,7 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
 
             String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(),
                     inputMsg.getToUserName(), returnTime, "text", "您尚未设置收件地址，请先设置收件地址。");
-            LOGGER.info(msg);
+            LOGGER.debug(msg);
             response.getOutputStream().write(msg.getBytes("UTF-8"));
             return;
         }
@@ -238,7 +238,7 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
             sb.append("\n").append("收件人：").append(tInvoice.getName());
             sb.append("\n").append("当前状态：").append(InvoiceStatus.getCodeAsName(tInvoice.getInvoiceStatus()));
             if (!BigDecimal.ZERO.equals(tInvoice.getTotalWeight())) {
-                sb.append("\n").append("包裹重量：").append(tInvoice.getTotalWeight());
+                sb.append("\n").append("包裹重量：").append(tInvoice.getTotalWeight()).append("KG");
             }
             if (!BigDecimal.ZERO.equals(tInvoice.getInvoiceAmountJpy())) {
                 sb.append("\n").append("运费合计：").append(tInvoice.getInvoiceAmountJpy()).append("日元").append(" ")
@@ -258,7 +258,7 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
             sb.append("\n----------\n包裹详细");
             for (TInvoiceDetail tInvoiceDetail : tInvoiceDetailLst) {
                 sb.append("\n包裹状态：").append(InvoiceDetailStatus.getCodeAsName(tInvoiceDetail.getStatus()));
-                sb.append("\n").append("重量：").append(tInvoiceDetail.getWeight());
+                sb.append("\n").append("重量：").append(tInvoiceDetail.getWeight()).append("KG");
                 sb.append("\n").append("快递单号：").append(tInvoiceDetail.getTrackingNo());
             }
         }
