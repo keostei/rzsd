@@ -2,16 +2,20 @@ package com.rzsd.wechat.service;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.rzsd.wechat.common.constrant.RzConst;
 import com.rzsd.wechat.common.dto.InvoiceData;
 import com.rzsd.wechat.common.dto.MUser;
 import com.rzsd.wechat.common.dto.TInvoice;
@@ -28,6 +32,8 @@ import com.rzsd.wechat.util.DateUtil;
 
 @Service
 public class InvoiceServiceImpl implements InvoiceService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(InvoiceServiceImpl.class.getName());
 
     @Autowired
     private TInvoiceMapper tInvoiceMappper;
@@ -383,6 +389,28 @@ public class InvoiceServiceImpl implements InvoiceService {
         tInvoiceDetail.setUpdateTime(DateUtil.getCurrentTimestamp());
         tInvoiceDetail.setUpdateId(loginUser.getId());
         tInvoiceDetailMapper.updateInvoiceDetailStatus(tInvoiceDetail);
+        return 0;
+    }
+
+    @Override
+    @Transactional
+    public int doUpdateDetailStatus(String oldStatus, String newStatus) {
+        LOGGER.info("[包裹状态自动更新开始]更新前状态：" + oldStatus + "(" + InvoiceDetailStatus.getCodeAsName(oldStatus) + ")，更新后状态："
+                + newStatus + "(" + InvoiceDetailStatus.getCodeAsName(newStatus) + ")");
+        TInvoiceDetail selectCond = new TInvoiceDetail();
+        selectCond.setStatus(oldStatus);
+        selectCond.setDelFlg("0");
+        List<TInvoiceDetail> tInvoiceDetailLst = tInvoiceDetailMapper.select(selectCond);
+        for (TInvoiceDetail tInvoiceDetail : tInvoiceDetailLst) {
+            LOGGER.info(MessageFormat.format("数据更新，流水号：{0}，行号：{1}", tInvoiceDetail.getInvoiceId(),
+                    tInvoiceDetail.getRowNo()));
+            tInvoiceDetail.setStatus(newStatus);
+            tInvoiceDetail.setUpdateTime(DateUtil.getCurrentTimestamp());
+            tInvoiceDetail.setUpdateId(RzConst.SYS_ADMIN_ID);
+            tInvoiceDetailMapper.update(tInvoiceDetail);
+        }
+        LOGGER.info("[包裹状态自动更新结束]更新前状态：" + oldStatus + "(" + InvoiceDetailStatus.getCodeAsName(oldStatus) + ")，更新后状态："
+                + newStatus + "(" + InvoiceDetailStatus.getCodeAsName(newStatus) + ")");
         return 0;
     }
 

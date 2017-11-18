@@ -325,4 +325,23 @@ public class WechatCustomIdLogicImpl implements WechatCustomIdLogic {
         response.getOutputStream().write(msg.getBytes("UTF-8"));
         return;
     }
+
+    @Override
+    public void initUserInfo(InputMessage inputMsg, HttpServletResponse response) {
+        // 获取用户信息
+        MUser selectCond = new MUser();
+        selectCond.setWechatOpenId(inputMsg.getFromUserName());
+        List<MUser> userList = mUserMapper.select(selectCond);
+        // 用户信息为查到时，先创建用户表
+        MUser mUser = new MUser();
+        if (userList.isEmpty()) {
+            mUser.setWechatOpenId(inputMsg.getFromUserName());
+            mUser.setCustomId(generateId(false, 'a'));
+            mUser.setUserType("0");
+            mUser.setCreateId(RzConst.SYS_ADMIN_ID);
+            mUser.setUpdateId(RzConst.SYS_ADMIN_ID);
+            mUserMapper.insert(mUser);
+            LOGGER.info("用户信息不存在，新创建用户，OpenId：" + inputMsg.getFromUserName() + "，客户编码" + mUser.getCustomId());
+        }
+    }
 }

@@ -91,6 +91,8 @@ public class WechatCmdServiceImpl implements WechatCmdService {
             LOGGER.info("消息创建时间：" + inputMsg.getCreateTime() + new Date(createTime * 1000l));
             LOGGER.info("消息内容：" + inputMsg.getContent());
             LOGGER.info("消息Id：" + inputMsg.getMsgId());
+            // 先检查用户，如不存在则创建用户表信息
+            wechatCustomIdLogicImpl.initUserInfo(inputMsg, response);
             // 快速指令
             if (wechatQuickLogicImpl.execute(inputMsg, response)) {
                 return;

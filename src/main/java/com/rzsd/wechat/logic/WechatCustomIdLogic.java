@@ -11,6 +11,8 @@ public interface WechatCustomIdLogic {
 
     String generateId(boolean isProxy, char proxyCd);
 
+    void initUserInfo(InputMessage inputMsg, HttpServletResponse response);
+
     void queryCustomInfo(InputMessage inputMsg, HttpServletResponse response)
             throws UnsupportedEncodingException, IOException;
 
