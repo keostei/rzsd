@@ -16,7 +16,7 @@ public class RzsdSchedule {
     @Autowired
     private InvoiceService invoiceServiceImpl;
 
-    @Scheduled(cron = "0 37 3 * * ?")
+    @Scheduled(cron = "0 43 2 * * ?")
     public void UpdateStatus() {
         LOGGER.info("状态更新开始：出库包裹---日本海关仓库");
         invoiceServiceImpl.doUpdateDetailStatus(InvoiceDetailStatus.CHUKU.getCode(),
