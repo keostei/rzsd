@@ -27,6 +27,9 @@ public interface InvoiceService {
 
     List<InvoiceDeliver> importInvoiceData(final List<InvoiceDeliver> invoiceDeliverLst, HttpServletRequest request);
 
+    List<InvoiceDeliver> checkImportInvoiceData(final List<InvoiceDeliver> invoiceDeliverLst,
+            HttpServletRequest request);
+
     List<InvoiceData> searchInvoiceData(InvoiceData invoiceDataCond);
 
     int editInvoiceData(InvoiceData invoiceDataCond, HttpServletRequest request);

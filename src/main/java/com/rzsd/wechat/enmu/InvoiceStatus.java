@@ -1,7 +1,22 @@
 package com.rzsd.wechat.enmu;
 
 public enum InvoiceStatus {
-    YUYUE("1", "已预约"), QUHUO("2", "已取货"), DABAO("3", "打包完成"), CHUKU("4", "已出库"),;
+    // 已预约
+    YUYUE("1", "已预约"),
+    // 已取货
+    QUHUO("2", "待发货"),
+    // 打包完成(未使用)
+    DABAO("3", "打包完成"),
+    // 已出库
+    CHUKU("4", "已出库"),
+    // 日本通关中
+    RBTGZ("5", "日本通关中"),
+    // 专机起飞
+    ZJQF("6", "专机起飞"),
+    // 到达清关口岸
+    GNQGKA("7", "到达清关口岸"),
+    // 已清关
+    QGWC("8", "已清关"),;
     private String _code;
     private String _name;
 

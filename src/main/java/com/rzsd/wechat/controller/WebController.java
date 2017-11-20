@@ -12,6 +12,7 @@ import java.text.MessageFormat;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -116,10 +117,14 @@ public class WebController {
     }
 
     @RequestMapping("system/invoice_download")
-    public void downloadInvoice(HttpServletResponse response) {
+    public void downloadInvoice(HttpServletResponse response,
+            @RequestParam(value = "path", required = false) String path) {
         try {
             String newFilePath = outputPath
                     + MessageFormat.format(outputName, DateUtil.format(DateUtil.getCurrentTimestamp(), "yyyyMMdd"));
+            if (!StringUtils.isEmpty(path)) {
+                newFilePath = path;
+            }
             // path是指欲下载的文件的路径。
             File file = new File(newFilePath);
             // 取得文件名。

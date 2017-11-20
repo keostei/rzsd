@@ -7,6 +7,7 @@ public class CheckUtil {
 
     public static final String REGEX_NUM = "^[0-9]*$";
     public static final String REGEX_ALPHABETA = "^[a-zA-Z]*$";
+    public static final String REGEX_ALPHABETA_NUM = "^[a-zA-Z0-9]*$";
 
     public static boolean isValidString(String str, String regEx) {
         Pattern pattern = Pattern.compile(regEx);

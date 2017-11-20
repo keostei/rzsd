@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,17 +16,19 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -53,6 +54,8 @@ import com.rzsd.wechat.util.ExcelReaderUtil;
 @RequestMapping("/rest")
 public class RestFullController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestFullController.class.getName());
+
     @Autowired
     private InvoiceService invoiceServiceImpl;
     @Autowired
@@ -68,6 +71,8 @@ public class RestFullController {
     private String templateName;
     @Value("${rzsd.output.file.path}")
     private String outputPath;
+    @Value("${rzsd.output.result.file.name}")
+    private String outputResultPath;
     @Value("${rzsd.output.file.name}")
     private String outputName;
     @Value("${rzsd.input.file.path}")
@@ -193,21 +198,120 @@ public class RestFullController {
                 break;
             }
             invoiceDeliver = new InvoiceDeliver();
-            invoiceDeliver.setInvoiceId(new BigInteger(ExcelReaderUtil.getCellValue(row, 0)));
-            invoiceDeliver.setInvoiceStatusName(ExcelReaderUtil.getCellValue(row, 6));
-            invoiceDeliver.setLogNo(ExcelReaderUtil.getCellValue(row, 7));
+            // 客户编码
+            invoiceDeliver.setCustomCd(ExcelReaderUtil.getCellValue(row, 1));
+            // 姓名
+            invoiceDeliver.setName(ExcelReaderUtil.getCellValue(row, 2));
+            // 电话
+            invoiceDeliver.setTelNo(ExcelReaderUtil.getCellValue(row, 3));
+            // 地址
+            invoiceDeliver.setAddress(ExcelReaderUtil.getCellValue(row, 4));
+            // 内部编码
+            invoiceDeliver.setLogNo(ExcelReaderUtil.getCellValue(row, 5));
+            // 国内快递单号
+            invoiceDeliver.setTrackingNo(ExcelReaderUtil.getCellValue(row, 6));
+            // 重量
+            invoiceDeliver.setStrWeight(ExcelReaderUtil.getCellValue(row, 7));
+            // 单价
+            invoiceDeliver.setStrPrice(ExcelReaderUtil.getCellValue(row, 8));
+            // 变更国内快递单号
+            invoiceDeliver.setNewTrackingNo(ExcelReaderUtil.getCellValue(row, 9));
 
-            invoiceDeliver.setTrackingNo(ExcelReaderUtil.getCellValue(row, 8));
-            invoiceDeliver.setWeight(new BigDecimal(ExcelReaderUtil.getCellValue(row, 9)));
-            if (!StringUtils.isEmpty(ExcelReaderUtil.getCellValue(row, 10))) {
-                invoiceDeliver.setPrice(new BigDecimal(ExcelReaderUtil.getCellValue(row, 10)));
-            }
             invoiceDeliverLst.add(invoiceDeliver);
             rowNum++;
         }
-        invoiceServiceImpl.importInvoiceData(invoiceDeliverLst, request);
+
+        //
+        invoiceDeliverLst = invoiceServiceImpl.checkImportInvoiceData(invoiceDeliverLst, request);
+        boolean hasError = false;
+        for (InvoiceDeliver dto : invoiceDeliverLst) {
+            if (!StringUtils.isEmpty(dto.getImportResult())) {
+                hasError = true;
+                break;
+            }
+        }
+        if (hasError) {
+            result.setFail(false);
+            String resultPath = saveResult(invoiceDeliverLst, xssfWorkbook, sheet, row);
+            result.setOptStr(resultPath);
+            return result;
+        }
+
+        invoiceDeliverLst = invoiceServiceImpl.importInvoiceData(invoiceDeliverLst, request);
+        String resultPath = saveResult(invoiceDeliverLst, xssfWorkbook, sheet, row);
+        result.setOptStr(resultPath);
         result.setFail(false);
         return result;
+    }
+
+    private String saveResult(List<InvoiceDeliver> invoiceDeliverLst, XSSFWorkbook xssfWorkbook, XSSFSheet sheet,
+            XSSFRow row) {
+        int rowNo = 1;
+        for (InvoiceDeliver dto : invoiceDeliverLst) {
+            rowNo++;
+            row = sheet.getRow(rowNo);
+            if (row == null) {
+                row = sheet.createRow(rowNo);
+                row.createCell(0).setCellValue(String.valueOf(rowNo - 1));
+                row.createCell(1).setCellValue(StringUtils.isEmpty(dto.getCustomCd()) ? "" : dto.getCustomCd());
+                row.createCell(2).setCellValue(StringUtils.isEmpty(dto.getName()) ? "" : dto.getName());
+                row.createCell(3).setCellValue(StringUtils.isEmpty(dto.getTelNo()) ? "" : dto.getTelNo());
+                row.createCell(4).setCellValue(StringUtils.isEmpty(dto.getAddress()) ? "" : dto.getAddress());
+                row.createCell(5).setCellValue(StringUtils.isEmpty(dto.getLogNo()) ? "" : dto.getLogNo());
+                row.createCell(6).setCellValue(StringUtils.isEmpty(dto.getTrackingNo()) ? "" : dto.getTrackingNo());
+                row.createCell(7).setCellValue(StringUtils.isEmpty(dto.getStrWeight()) ? "" : dto.getStrWeight());
+                row.createCell(8).setCellValue(StringUtils.isEmpty(dto.getStrPrice()) ? "" : dto.getStrPrice());
+                row.createCell(9)
+                        .setCellValue(StringUtils.isEmpty(dto.getNewTrackingNo()) ? "" : dto.getNewTrackingNo());
+                row.createCell(10)
+                        .setCellValue(StringUtils.isEmpty(dto.getImportResult()) ? "" : dto.getImportResult());
+            } else {
+                row.getCell(0).setCellValue(String.valueOf(rowNo - 1));
+                row.getCell(1).setCellValue(StringUtils.isEmpty(dto.getCustomCd()) ? "" : dto.getCustomCd());
+                row.getCell(2).setCellValue(StringUtils.isEmpty(dto.getName()) ? "" : dto.getName());
+                row.getCell(3).setCellValue(StringUtils.isEmpty(dto.getTelNo()) ? "" : dto.getTelNo());
+                row.getCell(4).setCellValue(StringUtils.isEmpty(dto.getAddress()) ? "" : dto.getAddress());
+                row.getCell(5).setCellValue(StringUtils.isEmpty(dto.getLogNo()) ? "" : dto.getLogNo());
+                row.getCell(6).setCellValue(StringUtils.isEmpty(dto.getTrackingNo()) ? "" : dto.getTrackingNo());
+                row.getCell(7).setCellValue(StringUtils.isEmpty(dto.getStrWeight()) ? "" : dto.getStrWeight());
+                row.getCell(8).setCellValue(StringUtils.isEmpty(dto.getStrPrice()) ? "" : dto.getStrPrice());
+                row.getCell(9).setCellValue(StringUtils.isEmpty(dto.getNewTrackingNo()) ? "" : dto.getNewTrackingNo());
+                row.getCell(10).setCellValue(StringUtils.isEmpty(dto.getImportResult()) ? "" : dto.getImportResult());
+            }
+            XSSFCellStyle style = xssfWorkbook.createCellStyle();
+            // 设置边框样式
+            style.setBorderTop(HSSFCellStyle.BORDER_THIN);
+            style.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+            style.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+            style.setBorderRight(HSSFCellStyle.BORDER_THIN);
+            // 设置边框颜色
+            style.setTopBorderColor(HSSFColor.BLACK.index);
+            style.setBottomBorderColor(HSSFColor.BLACK.index);
+            style.setLeftBorderColor(HSSFColor.BLACK.index);
+            style.setRightBorderColor(HSSFColor.BLACK.index);
+            for (int i = 0; i < 10; i++) {
+                if (row.getCell(i) == null) {
+                    row.createCell(i).setCellStyle(style);
+                } else {
+                    row.getCell(i).setCellStyle(style);
+                }
+            }
+        }
+
+        xssfWorkbook.setPrintArea(0, 0, 10, 0, rowNo);
+        String newFilePath = outputPath + MessageFormat.format(outputResultPath,
+                DateUtil.format(DateUtil.getCurrentTimestamp(), "yyyyMMddHHmmss"));
+        try {
+            File newFile = new File(newFilePath);
+            FileOutputStream fos = new FileOutputStream(newFile);
+            xssfWorkbook.setForceFormulaRecalculation(true);
+            xssfWorkbook.write(fos);
+            xssfWorkbook.close();
+            fos.close();
+        } catch (IOException e) {
+            LOGGER.error("结果文件保存失败。", e);
+        }
+        return newFilePath;
     }
 
     @RequestMapping("/system/search_data")
@@ -313,23 +417,23 @@ public class RestFullController {
             XSSFRow row = sheet.getRow(rowNo);
             if (row == null) {
                 row = sheet.createRow(rowNo);
-                row.createCell(0).setCellValue(String.valueOf(invoice.getInvoiceId()));
+                row.createCell(0).setCellValue(String.valueOf(rowNo - 1));
                 row.createCell(1).setCellValue(formatter.format(invoice.getInvoiceDate()));
                 row.createCell(2).setCellValue(invoice.getCustomCd());
                 row.createCell(3).setCellValue(StringUtils.isEmpty(invoice.getName()) ? "" : invoice.getName());
                 row.createCell(4).setCellValue(StringUtils.isEmpty(invoice.getTelNo()) ? "" : invoice.getTelNo());
                 row.createCell(5).setCellValue(StringUtils.isEmpty(invoice.getAddress()) ? "" : invoice.getAddress());
-                row.createCell(6).setCellValue("4：已出库");
+                // row.createCell(6).setCellValue("4：已出库");
             } else {
-                row.getCell(0).setCellValue(String.valueOf(invoice.getInvoiceId()));
+                row.getCell(0).setCellValue(String.valueOf(rowNo - 1));
                 row.getCell(1).setCellValue(formatter.format(invoice.getInvoiceDate()));
                 row.getCell(2).setCellValue(invoice.getCustomCd());
                 row.getCell(3).setCellValue(StringUtils.isEmpty(invoice.getName()) ? "" : invoice.getName());
                 row.getCell(4).setCellValue(StringUtils.isEmpty(invoice.getTelNo()) ? "" : invoice.getTelNo());
                 row.getCell(5).setCellValue(StringUtils.isEmpty(invoice.getAddress()) ? "" : invoice.getAddress());
-                row.getCell(6).setCellValue("4：已出库");
+                // row.getCell(6).setCellValue("4：已出库");
             }
-            for (int i = 0; i < 11; i++) {
+            for (int i = 0; i < 6; i++) {
                 if (row.getCell(i) == null) {
                     row.createCell(i).setCellStyle(style);
                 } else {
@@ -338,7 +442,7 @@ public class RestFullController {
             }
         }
 
-        xssfWorkbook.setPrintArea(0, 0, 10, 0, rowNo);
+        xssfWorkbook.setPrintArea(0, 0, 5, 0, rowNo);
         try {
             FileOutputStream fos = new FileOutputStream(newFile);
             xssfWorkbook.setForceFormulaRecalculation(true);

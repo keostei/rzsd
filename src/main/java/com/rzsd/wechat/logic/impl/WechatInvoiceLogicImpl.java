@@ -160,6 +160,20 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
             hasAddress = false;
         }
 
+        // 查询是否有已预约取货记录，如果有，则提示不要重复提出申请
+        TInvoice tInvoiceCond = new TInvoice();
+        tInvoiceCond.setInvoiceStatus(InvoiceStatus.YUYUE.getCode());
+        tInvoiceCond.setDelFlg("0");
+        List<TInvoice> lst = tInvoiceMapper.select(tInvoiceCond);
+        if (!lst.isEmpty()) {
+            String msg = WechatMessageUtil.getTextMessage("text.tinvoice.add.redexists", inputMsg.getFromUserName(),
+                    inputMsg.getToUserName(), lst.get(0).getCustomCd(), lst.get(0).getName(), lst.get(0).getTelNo(),
+                    lst.get(0).getAddress());
+            LOGGER.debug(msg);
+            response.getOutputStream().write(msg.getBytes("UTF-8"));
+            return;
+        }
+
         TInvoice tInvoice = new TInvoice();
         tInvoice.setInvoiceDate(DateUtil.getCurrentTimestamp());
         tInvoice.setCustomCd(customCd);

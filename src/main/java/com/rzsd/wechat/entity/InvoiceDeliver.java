@@ -14,6 +14,7 @@ public class InvoiceDeliver implements Serializable {
     private BigInteger invoiceId;
     private Date invoiceDate;
     private BigDecimal weight;
+    private String strWeight;
     private String customCd;
     private String name;
     private String telNo;
@@ -24,8 +25,10 @@ public class InvoiceDeliver implements Serializable {
     private BigDecimal invoiceAmountJpy;
     private BigDecimal invoiceAmountCny;
     private BigDecimal price;
+    private String strPrice;
     private String logNo;
     private String trackingNo;
+    private String newTrackingNo;
     private String importResult;
 
     public BigInteger getInvoiceId() {
@@ -50,6 +53,14 @@ public class InvoiceDeliver implements Serializable {
 
     public void setWeight(BigDecimal weight) {
         this.weight = weight;
+    }
+
+    public String getStrWeight() {
+        return strWeight;
+    }
+
+    public void setStrWeight(String strWeight) {
+        this.strWeight = strWeight;
     }
 
     public String getCustomCd() {
@@ -132,6 +143,14 @@ public class InvoiceDeliver implements Serializable {
         this.price = price;
     }
 
+    public String getStrPrice() {
+        return strPrice;
+    }
+
+    public void setStrPrice(String strPrice) {
+        this.strPrice = strPrice;
+    }
+
     public String getLogNo() {
         return logNo;
     }
@@ -148,6 +167,14 @@ public class InvoiceDeliver implements Serializable {
         this.trackingNo = trackingNo;
     }
 
+    public String getNewTrackingNo() {
+        return newTrackingNo;
+    }
+
+    public void setNewTrackingNo(String newTrackingNo) {
+        this.newTrackingNo = newTrackingNo;
+    }
+
     public String getImportResult() {
         return importResult;
     }
@@ -155,4 +182,5 @@ public class InvoiceDeliver implements Serializable {
     public void setImportResult(String importResult) {
         this.importResult = importResult;
     }
+
 }

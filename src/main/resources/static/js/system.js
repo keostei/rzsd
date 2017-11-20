@@ -41,6 +41,14 @@ $(function(){
                 alert('服务器响应失败，请稍候再试。');
                 return;
             }
+            var form=$("<form>");//定义一个form表单  
+            form.attr("style","display:none");  
+            form.attr("target","");  
+            form.attr("method","post");  
+            form.attr("action","system/invoice_download?path=" + json.optStr);  
+            $("body").append(form);//将表单放置在web中  
+            form.submit();//表单提交   
+            console.log('数据已成功下载。');
             alert('单号批量导入成功！');
         }).fail(function(xhr) {
             var messages = "";

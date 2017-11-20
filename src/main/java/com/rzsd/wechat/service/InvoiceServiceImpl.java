@@ -4,16 +4,18 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.rzsd.wechat.common.constrant.RzConst;
 import com.rzsd.wechat.common.dto.InvoiceData;
@@ -28,6 +30,8 @@ import com.rzsd.wechat.enmu.InvoiceDetailStatus;
 import com.rzsd.wechat.enmu.InvoiceStatus;
 import com.rzsd.wechat.entity.InvoiceDeliver;
 import com.rzsd.wechat.entity.LoginUser;
+import com.rzsd.wechat.exception.BussinessException;
+import com.rzsd.wechat.util.CheckUtil;
 import com.rzsd.wechat.util.DateUtil;
 
 @Service
@@ -186,6 +190,8 @@ public class InvoiceServiceImpl implements InvoiceService {
                 price = invoiceDeliver.getPrice();
             }
             totalWeight = totalWeight.add(invoiceDeliver.getWeight());
+
+            invoiceDeliver.setImportResult("导入成功");
         }
         // 对最后一组invoice数据进行更新
         if (invoiceId != null) {
@@ -412,6 +418,172 @@ public class InvoiceServiceImpl implements InvoiceService {
         LOGGER.info("[包裹状态自动更新结束]更新前状态：" + oldStatus + "(" + InvoiceDetailStatus.getCodeAsName(oldStatus) + ")，更新后状态："
                 + newStatus + "(" + InvoiceDetailStatus.getCodeAsName(newStatus) + ")");
         return 0;
+    }
+
+    @Override
+    public List<InvoiceDeliver> checkImportInvoiceData(List<InvoiceDeliver> invoiceDeliverLst,
+            HttpServletRequest request) {
+        // 按照客户编码排序
+        invoiceDeliverLst.sort((o1, o2) -> {
+            return o1.getCustomCd().compareTo(o2.getCustomCd());
+        });
+        // 客户编码单价map
+        Map<String, BigDecimal> priceMap = new HashMap<>();
+
+        BigInteger invoiceId = null;
+        String customId = null;
+        TInvoice tInvoiceCond = new TInvoice();
+        tInvoiceCond.setDelFlg("0");
+        tInvoiceCond.setInvoiceStatus(InvoiceStatus.QUHUO.getCode());
+        // 判断是单号变更，还是单号导入
+        boolean hasNewTrackingNo = false;
+        for (InvoiceDeliver invoiceDeliver : invoiceDeliverLst) {
+            if (!StringUtils.isEmpty(invoiceDeliver.getNewTrackingNo())) {
+                hasNewTrackingNo = true;
+                break;
+            }
+        }
+        boolean hasEmptyNewTrackingNo = false;
+        for (InvoiceDeliver invoiceDeliver : invoiceDeliverLst) {
+            if (StringUtils.isEmpty(invoiceDeliver.getNewTrackingNo())) {
+                hasEmptyNewTrackingNo = true;
+                break;
+            }
+        }
+        if (hasEmptyNewTrackingNo && hasNewTrackingNo) {
+            throw new BussinessException("系统无法判断单号导入还是变更单号。");
+        }
+        for (InvoiceDeliver invoiceDeliver : invoiceDeliverLst) {
+            // 变更快递单号check，填写时必须要有国内单号
+            if (!StringUtils.isEmpty(invoiceDeliver.getNewTrackingNo())) {
+                if (StringUtils.isEmpty(invoiceDeliver.getNewTrackingNo())) {
+                    invoiceDeliver.setImportResult("快递单号变更时，旧快递单号必须填写");
+                }
+                // 变更快递单号时，仅对单号做check
+                TInvoiceDetail selectCond = new TInvoiceDetail();
+                selectCond.setDelFlg("0");
+                selectCond.setTrackingNo(invoiceDeliver.getNewTrackingNo());
+                List<TInvoiceDetail> lst = tInvoiceDetailMapper.select(selectCond);
+                if (lst.isEmpty()) {
+                    invoiceDeliver.setImportResult("旧快递单号未导入系统");
+                }
+                if (lst.size() > 1) {
+                    invoiceDeliver.setImportResult("旧快递单号有多条记录存在");
+                }
+                continue;
+            }
+            // 客户编码
+            if (StringUtils.isEmpty(invoiceDeliver.getCustomCd())) {
+                invoiceDeliver.setImportResult("客户编码不能为空。");
+                continue;
+            }
+            if (invoiceDeliver.getCustomCd().length() == RzConst.CUSTOM_ID_LENGTH) {
+                // 默认客户编码
+                invoiceDeliver.setCustomCd(invoiceDeliver.getCustomCd() + "1");
+            }
+
+            // 客户编码发生变化时
+            if (!invoiceDeliver.getCustomCd().equals(customId)) {
+                invoiceId = null;
+                customId = invoiceDeliver.getCustomCd();
+                // 客户编码是否有发货申请
+                tInvoiceCond.setCustomCd(customId);
+                List<TInvoice> tInvoiceLst = tInvoiceMappper.select(tInvoiceCond);
+                if (tInvoiceLst.isEmpty()) {
+                    invoiceDeliver.setImportResult("发货申请不存在");
+                    continue;
+                }
+                // 客户编码是否存在多次发货记录
+                if (tInvoiceLst.size() > 1) {
+                    invoiceDeliver.setImportResult("存在多条发货申请记录");
+                    continue;
+                }
+                invoiceId = tInvoiceLst.get(0).getInvoiceId();
+                invoiceDeliver.setInvoiceId(invoiceId);
+            } else {
+                if (invoiceId == null) {
+                    invoiceDeliver.setImportResult("同上");
+                    continue;
+                }
+                invoiceDeliver.setInvoiceId(invoiceId);
+            }
+
+            // 内部编码 必须check，长度check
+            if (StringUtils.isEmpty(invoiceDeliver.getLogNo())) {
+                invoiceDeliver.setImportResult("内部编号不能为空");
+                continue;
+            }
+            if (!CheckUtil.isLengthValid(invoiceDeliver.getLogNo(), 20)) {
+                invoiceDeliver.setImportResult("内部编号长度不要超过20");
+                continue;
+            }
+
+            // 国内快递编号 必须check，长度check
+            if (StringUtils.isEmpty(invoiceDeliver.getTrackingNo())) {
+                invoiceDeliver.setImportResult("快递单号不能为空");
+                continue;
+            }
+            if (!CheckUtil.isLengthValid(invoiceDeliver.getTrackingNo(), 20)) {
+                invoiceDeliver.setImportResult("快递单号长度不要超过20");
+                continue;
+            }
+
+            // 重量必须check，长度check，数字check
+            if (StringUtils.isEmpty(invoiceDeliver.getStrWeight())) {
+                invoiceDeliver.setImportResult("重量不能为空");
+                continue;
+            }
+            if (!CheckUtil.isValidString(invoiceDeliver.getStrWeight(), CheckUtil.REGEX_NUM)) {
+                invoiceDeliver.setImportResult("重量只能是数字");
+                continue;
+            }
+            if (!CheckUtil.isLengthValid(invoiceDeliver.getStrWeight(), 2)) {
+                invoiceDeliver.setImportResult("重量不要超过20");
+                continue;
+            }
+            invoiceDeliver.setWeight(new BigDecimal(invoiceDeliver.getStrWeight()));
+
+            // 单价必须check，长度check，数字check
+            // if (StringUtils.isEmpty(invoiceDeliver.getStrPrice())) {
+            // invoiceDeliver.setImportResult("单价不能为空");
+            // continue;
+            // }
+            if (!CheckUtil.isValidString(invoiceDeliver.getStrPrice(), CheckUtil.REGEX_NUM)) {
+                invoiceDeliver.setImportResult("单价只能是数字");
+                continue;
+            }
+            if (!CheckUtil.isLengthValid(invoiceDeliver.getStrPrice(), 5)) {
+                invoiceDeliver.setImportResult("单价不要超过99999");
+                continue;
+            }
+
+            if (!StringUtils.isEmpty(invoiceDeliver.getStrPrice())) {
+                if (!priceMap.containsKey(customId)) {
+                    priceMap.put(customId, new BigDecimal(invoiceDeliver.getStrPrice()));
+                } else if (new BigDecimal(invoiceDeliver.getStrPrice()).compareTo(priceMap.get(customId)) != 0) {
+                    LOGGER.warn("同一个客户编码的有多个单价。客户编码：" + customId);
+                    invoiceDeliver.setImportResult("相同客户编码存在不同单价");
+                }
+            }
+        }
+
+        // 设置单价
+        for (InvoiceDeliver invoiceDeliver : invoiceDeliverLst) {
+            if (!StringUtils.isEmpty(invoiceDeliver.getImportResult())) {
+                continue;
+            }
+            if (!StringUtils.isEmpty(invoiceDeliver.getNewTrackingNo())) {
+                continue;
+            }
+            if (!priceMap.containsKey(invoiceDeliver.getCustomCd())) {
+                invoiceDeliver.setImportResult("未设置单价");
+                continue;
+            }
+            invoiceDeliver.setPrice(priceMap.get(invoiceDeliver.getCustomCd()));
+            invoiceDeliver.setStrPrice(String.valueOf(invoiceDeliver.getPrice()));
+        }
+
+        return invoiceDeliverLst;
     }
 
 }
