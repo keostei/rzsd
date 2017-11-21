@@ -1,5 +1,6 @@
 package com.rzsd.wechat.service;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,5 +39,5 @@ public interface InvoiceService {
 
     int doOnekeyUpdate(String lotNo, HttpServletRequest request);
 
-    int doUpdateDetailStatus(String oldStatus, String newStatus);
+    int doUpdateDetailStatus(String oldStatus, Date dateLine, String newStatus);
 }

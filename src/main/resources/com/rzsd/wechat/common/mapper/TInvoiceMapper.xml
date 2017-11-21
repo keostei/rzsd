@@ -20,6 +20,7 @@
         <if test="totalWeight != null">and total_weight = #{totalWeight}</if>
         <if test="invoiceAmountJpy != null">and invoice_amount_jpy = #{invoiceAmountJpy}</if>
         <if test="invoiceAmountCny != null">and invoice_amount_cny = #{invoiceAmountCny}</if>
+        <if test="shippingDate != null">and shipping_date = #{shippingDate}</if>
         <if test="delFlg != null">and del_flg = #{delFlg}</if>
         <if test="createTime != null">and create_time = #{createTime}</if>
         <if test="createId != null">and create_id = #{createId}</if>
@@ -48,6 +49,7 @@
         <if test="totalWeight != null">, total_weight</if>
         <if test="invoiceAmountJpy != null">, invoice_amount_jpy</if>
         <if test="invoiceAmountCny != null">, invoice_amount_cny</if>
+        <if test="shippingDate != null">, shipping_date</if>
         <if test="delFlg != null">, del_flg</if>
         <if test="createTime != null">, create_time</if>
         <if test="createId != null">, create_id</if>
@@ -68,6 +70,7 @@
         <if test="totalWeight != null">, #{totalWeight}</if>
         <if test="invoiceAmountJpy != null">, #{invoiceAmountJpy}</if>
         <if test="invoiceAmountCny != null">, #{invoiceAmountCny}</if>
+        <if test="shippingDate != null">, #{shippingDate}</if>
         <if test="delFlg != null">, #{delFlg}</if>
         <if test="createTime != null">, #{createTime}</if>
         <if test="createId != null">, #{createId}</if>
@@ -94,6 +97,7 @@
         <if test="totalWeight != null">, total_weight = #{totalWeight}</if>
         <if test="invoiceAmountJpy != null">, invoice_amount_jpy = #{invoiceAmountJpy}</if>
         <if test="invoiceAmountCny != null">, invoice_amount_cny = #{invoiceAmountCny}</if>
+        <if test="shippingDate != null">, shipping_date = #{shippingDate}</if>
         <if test="delFlg != null">, del_flg = #{delFlg}</if>
         <if test="createTime != null">, create_time = #{createTime}</if>
         <if test="createId != null">, create_id = #{createId}</if>
@@ -150,4 +154,14 @@
          </where>
          order by A.invoice_id desc, B.row_no 
     </select>
+    
+    <select id="getScheduledData" parameterType="tInvoice" resultType="tInvoice">
+        SELECT A.*
+        FROM `t_invoice` A
+        WHERE A.shipping_date <![CDATA[<=]]> #{shippingDate}
+        AND A.del_flg = '0' 
+        AND A.invoice_status = #{invoiceStatus}
+        ORDER BY A.invoice_id DESC
+    </select>
+    
 </mapper>

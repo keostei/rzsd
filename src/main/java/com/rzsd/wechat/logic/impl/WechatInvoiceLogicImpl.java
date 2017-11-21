@@ -2,7 +2,6 @@ package com.rzsd.wechat.logic.impl;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -22,8 +21,8 @@ import com.rzsd.wechat.common.mapper.MCustomInfoMapper;
 import com.rzsd.wechat.common.mapper.MUserMapper;
 import com.rzsd.wechat.common.mapper.TInvoiceDetailMapper;
 import com.rzsd.wechat.common.mapper.TInvoiceMapper;
+import com.rzsd.wechat.configuration.PropertiesListenerConfig;
 import com.rzsd.wechat.context.ChatContextInstance;
-import com.rzsd.wechat.enmu.InvoiceDetailStatus;
 import com.rzsd.wechat.enmu.InvoiceStatus;
 import com.rzsd.wechat.logic.WechatCustomIdLogic;
 import com.rzsd.wechat.logic.WechatInvoiceLogic;
@@ -207,6 +206,11 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
     public void queryInvoice(InputMessage inputMsg, HttpServletResponse response)
             throws UnsupportedEncodingException, IOException {
         Long returnTime = DateUtil.getCurrentTimestamp().getTime() / 1000;
+        String[] cmd = inputMsg.getContent().split(" ");
+        Long cnt = 1L;
+        if (cmd.length > 1) {
+            cnt = Long.valueOf(cmd[1]);
+        }
 
         // 检索用户信息
         MUser selectCond = new MUser();
@@ -233,7 +237,7 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
         tInvoiceCond.setDelFlg("0");
         tInvoiceCond.setCreateId(mUser.getId());
         tInvoiceCond.setOrderByStr(" invoice_date DESC ");
-        tInvoiceCond.setLimitCnt(3L);
+        tInvoiceCond.setLimitCnt(cnt);
         List<TInvoice> invoiceLst = tInvoiceMapper.select(tInvoiceCond);
         if (invoiceLst.isEmpty()) {
             String msg = WechatMessageUtil.getTextMessage("text.tinvoice.query.nodata", inputMsg.getFromUserName(),
@@ -244,37 +248,33 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("系统中查询到您最近三次发货记录是：");
+        int rowNo = 0;
         for (TInvoice tInvoice : invoiceLst) {
-            sb.append("\n==========");
-            sb.append("\n取件日期：").append(DateUtil.format(tInvoice.getInvoiceDate()));
-            sb.append("\n").append("客户编码：").append(tInvoice.getCustomCd());
-            sb.append("\n").append("收件人：").append(tInvoice.getName());
-            sb.append("\n").append("当前状态：").append(InvoiceStatus.getCodeAsName(tInvoice.getInvoiceStatus()));
-            if (!BigDecimal.ZERO.equals(tInvoice.getTotalWeight())) {
-                sb.append("\n").append("包裹重量：").append(tInvoice.getTotalWeight()).append("KG");
+            if (rowNo > 0) {
+                sb.append(PropertiesListenerConfig.getProperty("text.tinvoice.query.split"));
             }
-            if (!BigDecimal.ZERO.equals(tInvoice.getInvoiceAmountJpy())) {
-                sb.append("\n").append("运费合计：").append(tInvoice.getInvoiceAmountJpy()).append("日元").append(" ")
-                        .append(tInvoice.getInvoiceAmountCny()).append("人民币");
-                sb.append("\n请尽快完成支付，否则可能会影响正常清关，如已完成支付，请无视。");
-            }
-
+            sb.append(MessageFormat.format(PropertiesListenerConfig.getProperty("text.tinvoice.query.invoice.header"),
+                    tInvoice.getCustomCd(), tInvoice.getName()));
             TInvoiceDetail tInvoiceDetailCond = new TInvoiceDetail();
             tInvoiceDetailCond.setDelFlg("0");
             tInvoiceDetailCond.setInvoiceId(tInvoice.getInvoiceId());
             tInvoiceDetailCond.setOrderByStr(" row_no ");
             List<TInvoiceDetail> tInvoiceDetailLst = tInvoiceDetailMapper.select(tInvoiceDetailCond);
-            if (tInvoiceDetailLst.isEmpty()) {
-                continue;
-            }
-
-            sb.append("\n----------\n包裹详细");
             for (TInvoiceDetail tInvoiceDetail : tInvoiceDetailLst) {
-                sb.append("\n包裹状态：").append(InvoiceDetailStatus.getCodeAsName(tInvoiceDetail.getStatus()));
-                sb.append("\n").append("重量：").append(tInvoiceDetail.getWeight()).append("KG");
-                sb.append("\n").append("快递单号：").append(tInvoiceDetail.getTrackingNo());
+                sb.append(MessageFormat.format(PropertiesListenerConfig.getProperty("text.tinvoice.query.detail"),
+                        Integer.valueOf(tInvoiceDetail.getRowNo()), tInvoiceDetail.getTrackingNo(),
+                        tInvoiceDetail.getWeight()));
             }
+            if (!tInvoiceDetailLst.isEmpty()) {
+                sb.append(MessageFormat.format(PropertiesListenerConfig.getProperty("text.tinvoice.query.total"),
+                        tInvoice.getTotalWeight(), tInvoice.getInvoiceAmountJpy(), tInvoice.getInvoiceAmountCny()));
+            }
+            sb.append(MessageFormat.format(PropertiesListenerConfig.getProperty("text.tinvoice.query.status"),
+                    InvoiceStatus.getCodeAsName(tInvoice.getInvoiceStatus())));
+            if (tInvoice.getInvoiceStatus().compareTo(InvoiceStatus.CHUKU.getCode()) >= 0) {
+                sb.append(PropertiesListenerConfig.getProperty("text.tinvoice.query.paymentnotice"));
+            }
+            rowNo++;
         }
         String msg = MessageFormat.format(RzConst.WECHAT_MESSAGE, inputMsg.getFromUserName(), inputMsg.getToUserName(),
                 returnTime, "text", sb.toString());

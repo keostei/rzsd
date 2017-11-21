@@ -197,6 +197,10 @@ public class RestFullController {
             if (row == null) {
                 break;
             }
+            if (StringUtils.isEmpty(ExcelReaderUtil.getCellValue(row, 0))
+                    && StringUtils.isEmpty(ExcelReaderUtil.getCellValue(row, 1))) {
+                continue;
+            }
             invoiceDeliver = new InvoiceDeliver();
             // 客户编码
             invoiceDeliver.setCustomCd(ExcelReaderUtil.getCellValue(row, 1));
@@ -231,7 +235,7 @@ public class RestFullController {
             }
         }
         if (hasError) {
-            result.setFail(false);
+            result.setFail(true);
             String resultPath = saveResult(invoiceDeliverLst, xssfWorkbook, sheet, row);
             result.setOptStr(resultPath);
             return result;

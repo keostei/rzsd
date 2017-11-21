@@ -28,6 +28,10 @@ $(function(){
     });
 
     $('#btnImport').click(function(){
+    	if($('#uploadFile').val() === ''){
+    		alert('请选择回传单号文件。');
+    		return;
+    	}
     	var formData = new FormData($("#uploadForm")[0]);
     	$.ajax('rest/system/import', {
     		type: 'POST',  
@@ -37,10 +41,6 @@ $(function(){
             contentType: false,  
             processData: false
         }).done(function(json) {
-            if(json.isFail){
-                alert('服务器响应失败，请稍候再试。');
-                return;
-            }
             var form=$("<form>");//定义一个form表单  
             form.attr("style","display:none");  
             form.attr("target","");  
@@ -48,8 +48,11 @@ $(function(){
             form.attr("action","system/invoice_download?path=" + json.optStr);  
             $("body").append(form);//将表单放置在web中  
             form.submit();//表单提交   
-            console.log('数据已成功下载。');
-            alert('单号批量导入成功！');
+            if(json.fail){
+                alert('数据导入失败，请查看错误结果!');
+            } else {
+            	alert('数据导入成功。');
+            }
         }).fail(function(xhr) {
             var messages = "";
             if(401 == xhr.status){

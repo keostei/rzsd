@@ -35,8 +35,10 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
     private static final String TYPE_ADD_ADDRESS = "1";
     private static final String TYPE_APPLY = "2";
     private static final String TYPE_QUERY = "3";
-    private static final String TYPE_QUERY_ADDRESS = "4";
-    private static final String TYPE_EDIT_ADDRESS = "5";
+    private static final String TYPE_QUERY_3 = "4";
+    private static final String TYPE_QUERY_10 = "5";
+    private static final String TYPE_QUERY_ADDRESS = "6";
+    private static final String TYPE_EDIT_ADDRESS = "7";
 
     @Autowired
     private WechatCustomIdLogic wechatCustomIdLogicImpl;
@@ -121,6 +123,24 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
             ChatContextInstance.newInstance(openId);
             ChatContextInstance.setType(openId, inputMsg.getContent());
             String cmd = "查询";
+            inputMsg.setContent(cmd);
+            wechatInvoiceLogicImpl.queryInvoice(inputMsg, response);
+            ChatContextInstance.removeInstance(openId);
+            return true;
+        }
+        if (TYPE_QUERY_3.equals(inputMsg.getContent())) {
+            ChatContextInstance.newInstance(openId);
+            ChatContextInstance.setType(openId, inputMsg.getContent());
+            String cmd = "查询 3";
+            inputMsg.setContent(cmd);
+            wechatInvoiceLogicImpl.queryInvoice(inputMsg, response);
+            ChatContextInstance.removeInstance(openId);
+            return true;
+        }
+        if (TYPE_QUERY_10.equals(inputMsg.getContent())) {
+            ChatContextInstance.newInstance(openId);
+            ChatContextInstance.setType(openId, inputMsg.getContent());
+            String cmd = "查询 10";
             inputMsg.setContent(cmd);
             wechatInvoiceLogicImpl.queryInvoice(inputMsg, response);
             ChatContextInstance.removeInstance(openId);

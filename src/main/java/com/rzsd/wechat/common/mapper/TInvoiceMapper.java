@@ -15,5 +15,7 @@ public interface TInvoiceMapper {
 
     List<TInvoice> getPersonalInvoice(TInvoice selectCond);
 
+    List<TInvoice> getScheduledData(TInvoice selectCond);
+
     List<InvoiceData> getInvoiceData(InvoiceData invoiceData);
 }

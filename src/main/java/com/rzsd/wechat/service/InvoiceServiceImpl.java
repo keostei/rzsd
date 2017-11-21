@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -123,6 +124,48 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Transactional
     public List<InvoiceDeliver> importInvoiceData(List<InvoiceDeliver> invoiceDeliverLst, HttpServletRequest request) {
         LoginUser loginUser = (LoginUser) request.getSession().getAttribute("LOGIN_USER");
+
+        boolean hasNewTrackingNo = false;
+        for (InvoiceDeliver invoiceDeliver : invoiceDeliverLst) {
+            if (!StringUtils.isEmpty(invoiceDeliver.getNewTrackingNo())) {
+                hasNewTrackingNo = true;
+                break;
+            }
+        }
+
+        if (hasNewTrackingNo) {
+            TInvoiceDetail selectCond = new TInvoiceDetail();
+            selectCond.setDelFlg("0");
+            List<TInvoiceDetail> lst;
+            for (InvoiceDeliver invoiceDeliver : invoiceDeliverLst) {
+                // 变更快递单号时，仅对单号做check
+                selectCond.setTrackingNo(invoiceDeliver.getTrackingNo());
+                lst = tInvoiceDetailMapper.select(selectCond);
+                if (lst.isEmpty()) {
+                    LOGGER.warn("旧快递单号未导入系统。单号：" + invoiceDeliver.getTrackingNo());
+                    continue;
+                }
+                if (lst.size() > 1) {
+                    LOGGER.warn("旧快递单号有多条记录存在。单号：" + invoiceDeliver.getTrackingNo());
+                    continue;
+                }
+                TInvoiceDetail tInvoiceDetail = lst.get(0);
+                tInvoiceDetail.setTrackingNo(invoiceDeliver.getNewTrackingNo());
+                tInvoiceDetail.setUpdateId(loginUser.getId());
+                tInvoiceDetail.setUpdateTime(DateUtil.getCurrentTimestamp());
+                tInvoiceDetailMapper.update(tInvoiceDetail);
+                LOGGER.info(MessageFormat.format("单号更新成功，流水号：{0}，内部编号：{1}，旧单号：{2}，新单号：{3}",
+                        tInvoiceDetail.getInvoiceId(), tInvoiceDetail.getLotNo(), invoiceDeliver.getTrackingNo(),
+                        tInvoiceDetail.getTrackingNo()));
+                invoiceDeliver.setImportResult("单号更新成功");
+            }
+            return invoiceDeliverLst;
+        }
+
+        return importData(invoiceDeliverLst, loginUser);
+    }
+
+    private List<InvoiceDeliver> importData(List<InvoiceDeliver> invoiceDeliverLst, LoginUser loginUser) {
         invoiceDeliverLst.sort((o1, o2) -> {
             if (!o1.getInvoiceId().equals(o2.getInvoiceId())) {
                 return o1.getInvoiceId().compareTo(o2.getInvoiceId());
@@ -150,6 +193,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 tInvoice.setInvoiceAmountJpy(
                         priceContext.calcPrice(tInvoice.getCreateId(), totalWeight, price, loginUser.getId()));
                 tInvoice.setInvoiceAmountCny(tInvoice.getInvoiceAmountJpy().multiply(rate));
+                tInvoice.setInvoiceDate(DateUtil.getCurrentTimestamp());
                 tInvoice.setUpdateId(loginUser.getId());
                 tInvoice.setUpdateTime(DateUtil.getCurrentTimestamp());
                 tInvoiceMappper.update(tInvoice);
@@ -190,7 +234,8 @@ public class InvoiceServiceImpl implements InvoiceService {
                 price = invoiceDeliver.getPrice();
             }
             totalWeight = totalWeight.add(invoiceDeliver.getWeight());
-
+            LOGGER.info(MessageFormat.format("数据导入成功，流水号：{0}，行号：{1}，内部编号：{2}，单号：{3}", tInvoiceDetail.getInvoiceId(),
+                    tInvoiceDetail.getRowNo(), tInvoiceDetail.getLotNo(), tInvoiceDetail.getTrackingNo()));
             invoiceDeliver.setImportResult("导入成功");
         }
         // 对最后一组invoice数据进行更新
@@ -205,6 +250,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             tInvoice.setInvoiceAmountJpy(
                     priceContext.calcPrice(tInvoice.getCreateId(), totalWeight, price, loginUser.getId()));
             tInvoice.setInvoiceAmountCny(tInvoice.getInvoiceAmountJpy().multiply(rate));
+            tInvoice.setInvoiceDate(DateUtil.getCurrentTimestamp());
             tInvoice.setUpdateId(loginUser.getId());
             tInvoice.setUpdateTime(DateUtil.getCurrentTimestamp());
             tInvoiceMappper.update(tInvoice);
@@ -394,29 +440,30 @@ public class InvoiceServiceImpl implements InvoiceService {
         tInvoiceDetail.setLotNo(lotNo);
         tInvoiceDetail.setUpdateTime(DateUtil.getCurrentTimestamp());
         tInvoiceDetail.setUpdateId(loginUser.getId());
-        tInvoiceDetailMapper.updateInvoiceDetailStatus(tInvoiceDetail);
-        return 0;
+        int updCnt = tInvoiceDetailMapper.updateInvoiceDetailStatus(tInvoiceDetail);
+        LOGGER.info("一键清关成功，包裹批次：" + lotNo + "，共计" + updCnt + "个包裹。");
+        return updCnt;
     }
 
     @Override
     @Transactional
-    public int doUpdateDetailStatus(String oldStatus, String newStatus) {
-        LOGGER.info("[包裹状态自动更新开始]更新前状态：" + oldStatus + "(" + InvoiceDetailStatus.getCodeAsName(oldStatus) + ")，更新后状态："
-                + newStatus + "(" + InvoiceDetailStatus.getCodeAsName(newStatus) + ")");
-        TInvoiceDetail selectCond = new TInvoiceDetail();
-        selectCond.setStatus(oldStatus);
+    public int doUpdateDetailStatus(String oldStatus, Date dateLine, String newStatus) {
+        LOGGER.info("[包裹状态自动更新开始]更新前状态：" + oldStatus + "(" + InvoiceStatus.getCodeAsName(oldStatus) + ")，更新后状态："
+                + newStatus + "(" + InvoiceStatus.getCodeAsName(newStatus) + ")");
+        TInvoice selectCond = new TInvoice();
+        selectCond.setInvoiceStatus(oldStatus);
+        selectCond.setShippingDate(dateLine);
         selectCond.setDelFlg("0");
-        List<TInvoiceDetail> tInvoiceDetailLst = tInvoiceDetailMapper.select(selectCond);
-        for (TInvoiceDetail tInvoiceDetail : tInvoiceDetailLst) {
-            LOGGER.info(MessageFormat.format("数据更新，流水号：{0}，行号：{1}", tInvoiceDetail.getInvoiceId(),
-                    tInvoiceDetail.getRowNo()));
-            tInvoiceDetail.setStatus(newStatus);
-            tInvoiceDetail.setUpdateTime(DateUtil.getCurrentTimestamp());
-            tInvoiceDetail.setUpdateId(RzConst.SYS_ADMIN_ID);
-            tInvoiceDetailMapper.update(tInvoiceDetail);
+        List<TInvoice> tInvoiceLst = tInvoiceMappper.getScheduledData(selectCond);
+        for (TInvoice tInvoice : tInvoiceLst) {
+            LOGGER.info(MessageFormat.format("数据更新，流水号：{0}", tInvoice.getInvoiceId()));
+            tInvoice.setInvoiceStatus(newStatus);
+            tInvoice.setUpdateTime(DateUtil.getCurrentTimestamp());
+            tInvoice.setUpdateId(RzConst.SYS_ADMIN_ID);
+            tInvoiceMappper.update(tInvoice);
         }
-        LOGGER.info("[包裹状态自动更新结束]更新前状态：" + oldStatus + "(" + InvoiceDetailStatus.getCodeAsName(oldStatus) + ")，更新后状态："
-                + newStatus + "(" + InvoiceDetailStatus.getCodeAsName(newStatus) + ")");
+        LOGGER.info("[包裹状态自动更新结束]更新前状态：" + oldStatus + "(" + InvoiceStatus.getCodeAsName(oldStatus) + ")，更新后状态："
+                + newStatus + "(" + InvoiceStatus.getCodeAsName(newStatus) + ")");
         return 0;
     }
 
@@ -462,7 +509,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 // 变更快递单号时，仅对单号做check
                 TInvoiceDetail selectCond = new TInvoiceDetail();
                 selectCond.setDelFlg("0");
-                selectCond.setTrackingNo(invoiceDeliver.getNewTrackingNo());
+                selectCond.setTrackingNo(invoiceDeliver.getTrackingNo());
                 List<TInvoiceDetail> lst = tInvoiceDetailMapper.select(selectCond);
                 if (lst.isEmpty()) {
                     invoiceDeliver.setImportResult("旧快递单号未导入系统");

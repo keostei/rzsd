@@ -6,8 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.rzsd.wechat.enmu.InvoiceDetailStatus;
+import com.rzsd.wechat.enmu.InvoiceStatus;
 import com.rzsd.wechat.service.InvoiceService;
+import com.rzsd.wechat.util.DateUtil;
 
 @Component
 public class RzsdSchedule {
@@ -18,33 +19,26 @@ public class RzsdSchedule {
 
     @Scheduled(cron = "0 0 * * * ?")
     public void UpdateStatus1() {
-        LOGGER.info("状态更新开始：出库包裹---日本海关仓库");
-        invoiceServiceImpl.doUpdateDetailStatus(InvoiceDetailStatus.CHUKU.getCode(),
-                InvoiceDetailStatus.RBHGCK.getCode());
-        LOGGER.info("状态更新结束：出库包裹---日本海关仓库");
+        LOGGER.info("状态更新开始：出库---日本通关中");
+        invoiceServiceImpl.doUpdateDetailStatus(InvoiceStatus.CHUKU.getCode(), DateUtil.getCurrentTimestamp(),
+                InvoiceStatus.RBTGZ.getCode());
+        LOGGER.info("状态更新结束：出库---日本通关中");
     }
 
     @Scheduled(cron = "0 5 * * * ?")
     public void UpdateStatus2() {
-        LOGGER.info("状态更新开始：日本海关仓库---日本海关清关完成");
-        invoiceServiceImpl.doUpdateDetailStatus(InvoiceDetailStatus.RBHGCK.getCode(),
-                InvoiceDetailStatus.RBHGQGWC.getCode());
-        LOGGER.info("状态更新结束：日本海关仓库---日本海关清关完成");
+        LOGGER.info("状态更新开始：日本通关中---专机起飞");
+        invoiceServiceImpl.doUpdateDetailStatus(InvoiceStatus.RBTGZ.getCode(), DateUtil.getCurrentTimestamp(),
+                InvoiceStatus.ZJQF.getCode());
+        LOGGER.info("状态更新结束：日本通关中---专机起飞");
     }
 
     @Scheduled(cron = "0 10 * * * ?")
     public void UpdateStatus3() {
-        LOGGER.info("状态更新开始：日本海关清关完成---转机起飞");
-        invoiceServiceImpl.doUpdateDetailStatus(InvoiceDetailStatus.RBHGQGWC.getCode(),
-                InvoiceDetailStatus.ZJQF.getCode());
-        LOGGER.info("状态更新结束：日本海关清关完成---转机起飞");
+        LOGGER.info("状态更新开始：专机起飞---清关口岸");
+        invoiceServiceImpl.doUpdateDetailStatus(InvoiceStatus.ZJQF.getCode(),
+                DateUtil.addDays(DateUtil.getCurrentTimestamp(), -3), InvoiceStatus.GNQGKA.getCode());
+        LOGGER.info("状态更新结束：专机起飞---清关口岸");
     }
 
-    @Scheduled(cron = "0 15 * * * ?")
-    public void UpdateStatus4() {
-        LOGGER.info("状态更新开始：转机起飞---到达国内海关仓库");
-        invoiceServiceImpl.doUpdateDetailStatus(InvoiceDetailStatus.ZJQF.getCode(),
-                InvoiceDetailStatus.GNHGCK.getCode());
-        LOGGER.info("状态更新结束：转机起飞---到达国内海关仓库");
-    }
 }

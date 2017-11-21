@@ -49,7 +49,7 @@ public class TestController {
             throws UnsupportedEncodingException, IOException {
 
         InputMessage inputMsg = new InputMessage();
-        inputMsg.setFromUserName("openId-test-1108001");
+        inputMsg.setFromUserName("oyti2juH1-7x3mBjovXuIA_8LQKg");
         inputMsg.setToUserName("KEOSIMAGE");
         inputMsg.setContent("5");
 
@@ -66,6 +66,6 @@ public class TestController {
         // inputMsg.setContent("13951741096");
         // wechatQuickLogicImpl.execute(inputMsg, response);
         // inputMsg.setContent("江苏省南京市奥体大街69号新城科技园5栋5楼");
-        // wechatQuickLogicImpl.execute(inputMsg, response);
+        wechatQuickLogicImpl.execute(inputMsg, response);
     }
 }

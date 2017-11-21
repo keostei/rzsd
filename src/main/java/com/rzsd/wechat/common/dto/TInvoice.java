@@ -25,6 +25,7 @@ public class TInvoice extends BaseDataAccessDto {
     private BigDecimal totalWeight;
     private BigDecimal invoiceAmountJpy;
     private BigDecimal invoiceAmountCny;
+    private Date shippingDate;
 
     public BigInteger getInvoiceId() {
         return invoiceId;
@@ -145,4 +146,13 @@ public class TInvoice extends BaseDataAccessDto {
     public void setInvoiceAmountCny(BigDecimal invoiceAmountCny) {
         this.invoiceAmountCny = invoiceAmountCny;
     }
+
+    public Date getShippingDate() {
+        return shippingDate;
+    }
+
+    public void setShippingDate(Date shippingDate) {
+        this.shippingDate = shippingDate;
+    }
+
 }
