@@ -13,4 +13,6 @@ public interface TInvoiceDetailMapper {
     int update(TInvoiceDetail tInvoiceDetail);
 
     int updateInvoiceDetailStatus(TInvoiceDetail tInvoiceDetail);
+
+    List<TInvoiceDetail> selectInvoiceDetailByLotNo(TInvoiceDetail selectCond);
 }

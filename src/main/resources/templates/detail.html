@@ -49,7 +49,7 @@
                             <div class="panel panel-success" th:each="invoiceDetail,iterStat:${invoiceDetailList}">
                                 <div class="panel-heading" th:text="${invoiceDetail.trackingNo}">EMS12345678</div>
                                 <div class="panel-body">
-                                    <p><span th:text="${'当前状态：' + invoiceDetail.statusName}">当前状态: 国内清关完成</span></p>
+                                    <!-- <p><span th:text="${'当前状态：' + invoiceDetail.statusName}">当前状态: 国内清关完成</span></p> -->
                                     <p><span th:text="${'包裹编号：' + invoiceDetail.lotNo}">包裹编号: RZ-A-01</span></p>
                                     <p><span th:text="${invoiceDetail.weight == 0}?'包裹重量：- KG': '包裹重量：' + ${invoiceDetail.weight} + ' KG'">包裹重量: 18.70KG</span></p>
                                 </div>

@@ -86,4 +86,14 @@
         AND lot_no  LIKE concat(concat('%',#{lotNo}),'%')
         AND status <![CDATA[<>]]> '7'
     </update>
+    
+    <select id="selectInvoiceDetailByLotNo" parameterType="tInvoiceDetail" resultType="tInvoiceDetail">
+        select *
+        from t_invoice_detail
+        where
+        1=1
+        AND lot_no  LIKE concat(concat('%',#{lotNo}),'%')
+        AND del_flg = '0'
+        ORDER BY invoice_id,row_no
+    </select>
 </mapper>

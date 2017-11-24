@@ -193,7 +193,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 tInvoice.setInvoiceAmountJpy(
                         priceContext.calcPrice(tInvoice.getCreateId(), totalWeight, price, loginUser.getId()));
                 tInvoice.setInvoiceAmountCny(tInvoice.getInvoiceAmountJpy().multiply(rate));
-                tInvoice.setInvoiceDate(DateUtil.getCurrentTimestamp());
+                tInvoice.setShippingDate(DateUtil.getCurrentTimestamp());
                 tInvoice.setUpdateId(loginUser.getId());
                 tInvoice.setUpdateTime(DateUtil.getCurrentTimestamp());
                 tInvoiceMappper.update(tInvoice);
@@ -250,7 +250,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             tInvoice.setInvoiceAmountJpy(
                     priceContext.calcPrice(tInvoice.getCreateId(), totalWeight, price, loginUser.getId()));
             tInvoice.setInvoiceAmountCny(tInvoice.getInvoiceAmountJpy().multiply(rate));
-            tInvoice.setInvoiceDate(DateUtil.getCurrentTimestamp());
+            tInvoice.setShippingDate(DateUtil.getCurrentTimestamp());
             tInvoice.setUpdateId(loginUser.getId());
             tInvoice.setUpdateTime(DateUtil.getCurrentTimestamp());
             tInvoiceMappper.update(tInvoice);
@@ -435,12 +435,39 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Transactional
     public int doOnekeyUpdate(String lotNo, HttpServletRequest request) {
         LoginUser loginUser = (LoginUser) request.getSession().getAttribute("LOGIN_USER");
-        TInvoiceDetail tInvoiceDetail = new TInvoiceDetail();
-        tInvoiceDetail.setStatus(InvoiceDetailStatus.GNHGQGWC.getCode());
-        tInvoiceDetail.setLotNo(lotNo);
-        tInvoiceDetail.setUpdateTime(DateUtil.getCurrentTimestamp());
-        tInvoiceDetail.setUpdateId(loginUser.getId());
-        int updCnt = tInvoiceDetailMapper.updateInvoiceDetailStatus(tInvoiceDetail);
+        TInvoiceDetail tInvoiceDetailCond = new TInvoiceDetail();
+        tInvoiceDetailCond.setLotNo(lotNo);
+        List<TInvoiceDetail> tInvoiceDetailLst = tInvoiceDetailMapper.selectInvoiceDetailByLotNo(tInvoiceDetailCond);
+
+        TInvoice tInvoiceCond = new TInvoice();
+        tInvoiceCond.setDelFlg("0");
+
+        BigInteger invoiceId = null;
+        TInvoice tInvoice = null;
+        int updCnt = 0;
+        for (TInvoiceDetail tInvoiceDetail : tInvoiceDetailLst) {
+            if (tInvoiceDetail.getInvoiceId().equals(invoiceId)) {
+                continue;
+            }
+            invoiceId = tInvoiceDetail.getInvoiceId();
+
+            // 获取流水信息
+            tInvoiceCond.setInvoiceId(invoiceId);
+            List<TInvoice> tInvoiceLst = tInvoiceMappper.select(tInvoiceCond);
+            if (tInvoiceLst.isEmpty()) {
+                LOGGER.warn("流水表数据不存在，流水ID：" + String.valueOf(invoiceId));
+                continue;
+            }
+            tInvoice = tInvoiceLst.get(0);
+            if (InvoiceStatus.QGWC.getCode().equals(tInvoice.getInvoiceStatus())) {
+                LOGGER.info("清关已完成，不再重复清关，流水ID：" + String.valueOf(invoiceId));
+                continue;
+            }
+            tInvoice.setInvoiceStatus(InvoiceStatus.QGWC.getCode());
+            tInvoice.setUpdateTime(DateUtil.getCurrentTimestamp());
+            tInvoice.setUpdateId(loginUser.getId());
+            updCnt += tInvoiceMappper.update(tInvoice);
+        }
         LOGGER.info("一键清关成功，包裹批次：" + lotNo + "，共计" + updCnt + "个包裹。");
         return updCnt;
     }
