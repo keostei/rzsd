@@ -233,7 +233,7 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
             selectCond.setWechatOpenId(openId);
             List<MUser> userList = mUserMapper.select(selectCond);
 
-            if (userList.isEmpty()) {
+            if (userList.isEmpty() || StringUtils.isEmpty(userList.get(0).getUserName())) {
                 // 用户已经注册网站账号
                 String msg = WechatMessageUtil.getTextMessage("text.quick.createacc.err.resetpwdnotregisted",
                         inputMsg.getFromUserName(), inputMsg.getToUserName());
@@ -576,7 +576,7 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
                 selectCond.setWechatOpenId(openId);
                 List<MUser> userList = mUserMapper.select(selectCond);
 
-                if (!userList.isEmpty()) {
+                if ((!userList.isEmpty()) && (!StringUtils.isEmpty(userList.get(0).getUserName()))) {
                     // 用户已经注册网站账号
                     String msg = WechatMessageUtil.getTextMessage("text.quick.createacc.err.registed",
                             inputMsg.getFromUserName(), inputMsg.getToUserName());
