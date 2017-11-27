@@ -619,7 +619,7 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
                     return true;
                 }
                 String cmd = "创建账号 " + chatContextDto.getWord1().replace(" ", "") + " 日中 "
-                        + chatContextDto.getWord2().replace(" ", "");
+                        + inputMsg.getContent().replace(" ", "");
                 inputMsg.setContent(cmd);
                 wechatUserLogicImpl.createUser(inputMsg, response);
                 ChatContextInstance.removeInstance(openId);
