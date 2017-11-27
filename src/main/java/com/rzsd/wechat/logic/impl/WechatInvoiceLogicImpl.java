@@ -162,6 +162,7 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
         // 查询是否有已预约取货记录，如果有，则提示不要重复提出申请
         TInvoice tInvoiceCond = new TInvoice();
         tInvoiceCond.setInvoiceStatus(InvoiceStatus.YUYUE.getCode());
+        tInvoiceCond.setCreateId(mUser.getId());
         tInvoiceCond.setDelFlg("0");
         List<TInvoice> lst = tInvoiceMapper.select(tInvoiceCond);
         if (!lst.isEmpty()) {
