@@ -605,7 +605,7 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
 
             }
             if (StringUtils.isEmpty(chatContextDto.getWord2())) {
-                if (CheckUtil.isLengthValid(inputMsg.getContent(), 6)) {
+                if (CheckUtil.isLengthValid(inputMsg.getContent(), 5)) {
                     String msg = WechatMessageUtil.getTextMessage("text.quick.createacc.err.pwdlen",
                             inputMsg.getFromUserName(), inputMsg.getToUserName());
                     response.getOutputStream().write(msg.getBytes("UTF-8"));
@@ -637,7 +637,7 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
 
         if (TYPE_RESET_PASSWORD.equals(chatContextDto.getType())) {
             if (StringUtils.isEmpty(chatContextDto.getWord1())) {
-                if (CheckUtil.isLengthValid(inputMsg.getContent(), 6)) {
+                if (CheckUtil.isLengthValid(inputMsg.getContent(), 5)) {
                     String msg = WechatMessageUtil.getTextMessage("text.quick.createacc.err.pwdlen",
                             inputMsg.getFromUserName(), inputMsg.getToUserName());
                     response.getOutputStream().write(msg.getBytes("UTF-8"));
@@ -650,7 +650,7 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
                     response.getOutputStream().write(msg.getBytes("UTF-8"));
                     return true;
                 }
-                String cmd = "重置密码 " + chatContextDto.getWord1().replace(" ", "");
+                String cmd = "重置密码 " + inputMsg.getContent().replace(" ", "");
                 inputMsg.setContent(cmd);
                 wechatUserLogicImpl.updatePassword(inputMsg, response);
                 ChatContextInstance.removeInstance(openId);
