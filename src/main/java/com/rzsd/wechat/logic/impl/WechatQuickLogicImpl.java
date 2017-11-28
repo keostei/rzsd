@@ -419,7 +419,7 @@ public class WechatQuickLogicImpl implements WechatQuickLogic {
                 }
                 ChatContextInstance.setWord3(openId, inputMsg.getContent());
                 String msg = WechatMessageUtil.getTextMessage("text.quick.hint.address", inputMsg.getFromUserName(),
-                        inputMsg.getToUserName(), chatContextDto.getWord1());
+                        inputMsg.getToUserName(), chatContextDto.getWord2());
                 response.getOutputStream().write(msg.getBytes("UTF-8"));
                 LOGGER.debug(msg);
                 return true;
