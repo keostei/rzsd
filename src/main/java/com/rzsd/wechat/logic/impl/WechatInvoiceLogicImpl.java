@@ -162,20 +162,24 @@ public class WechatInvoiceLogicImpl implements WechatInvoiceLogic {
 
         // 查询是否有已预约取货记录，如果有，则提示不要重复提出申请
         TInvoice tInvoiceCond = new TInvoice();
-        tInvoiceCond.setInvoiceStatus(InvoiceStatus.YUYUE.getCode());
+        // tInvoiceCond.setInvoiceStatus(InvoiceStatus.YUYUE.getCode());
         tInvoiceCond.setCustomCd(customCd);
         tInvoiceCond.setDelFlg("0");
         List<TInvoice> lst = tInvoiceMapper.select(tInvoiceCond);
-        if (!lst.isEmpty()) {
-            String msg = WechatMessageUtil.getTextMessage("text.tinvoice.add.redexists", inputMsg.getFromUserName(),
-                    inputMsg.getToUserName(),
-                    StringUtils.isEmpty(lst.get(0).getCustomCd()) ? "未设置" : lst.get(0).getCustomCd(),
-                    StringUtils.isEmpty(lst.get(0).getName()) ? "未设置" : lst.get(0).getName(),
-                    StringUtils.isEmpty(lst.get(0).getTelNo()) ? "未设置" : lst.get(0).getTelNo(),
-                    StringUtils.isEmpty(lst.get(0).getAddress()) ? "未设置" : lst.get(0).getAddress());
-            LOGGER.debug(msg);
-            response.getOutputStream().write(msg.getBytes("UTF-8"));
-            return;
+        for (TInvoice tInvoice : lst) {
+            if (InvoiceStatus.YUYUE.getCode().equals(tInvoice.getInvoiceStatus())
+                    || InvoiceStatus.QUHUO.getCode().equals(tInvoice.getInvoiceStatus())
+                    || InvoiceStatus.DABAO.getCode().equals(tInvoice.getInvoiceStatus())) {
+                String msg = WechatMessageUtil.getTextMessage("text.tinvoice.add.redexists", inputMsg.getFromUserName(),
+                        inputMsg.getToUserName(),
+                        StringUtils.isEmpty(lst.get(0).getCustomCd()) ? "未设置" : lst.get(0).getCustomCd(),
+                        StringUtils.isEmpty(lst.get(0).getName()) ? "未设置" : lst.get(0).getName(),
+                        StringUtils.isEmpty(lst.get(0).getTelNo()) ? "未设置" : lst.get(0).getTelNo(),
+                        StringUtils.isEmpty(lst.get(0).getAddress()) ? "未设置" : lst.get(0).getAddress());
+                LOGGER.debug(msg);
+                response.getOutputStream().write(msg.getBytes("UTF-8"));
+                return;
+            }
         }
 
         TInvoice tInvoice = new TInvoice();
