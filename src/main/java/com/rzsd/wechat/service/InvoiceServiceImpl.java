@@ -423,6 +423,19 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     @Transactional
     public int doAppointment(TInvoice tInvoice, HttpServletRequest request) {
+        TInvoice tInvoiceCond = new TInvoice();
+        // tInvoiceCond.setInvoiceStatus(InvoiceStatus.YUYUE.getCode());
+        tInvoiceCond.setCustomCd(tInvoice.getCustomCd());
+        tInvoiceCond.setDelFlg("0");
+        List<TInvoice> lst = tInvoiceMappper.select(tInvoiceCond);
+        for (TInvoice tInvoiceInfo : lst) {
+            if (InvoiceStatus.YUYUE.getCode().equals(tInvoiceInfo.getInvoiceStatus())
+                    || InvoiceStatus.QUHUO.getCode().equals(tInvoiceInfo.getInvoiceStatus())
+                    || InvoiceStatus.DABAO.getCode().equals(tInvoiceInfo.getInvoiceStatus())) {
+                throw new BussinessException("您之前提出的发货申请尚未发货，本次申请将跟之前申请合并发货。\n客户编号：" + tInvoice.getCustomCd());
+            }
+        }
+
         LoginUser loginUser = (LoginUser) request.getSession().getAttribute("LOGIN_USER");
         tInvoice.setInvoiceStatus(InvoiceStatus.YUYUE.getCode());
         tInvoice.setCreateId(loginUser.getId());

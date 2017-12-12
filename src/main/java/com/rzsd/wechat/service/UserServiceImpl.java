@@ -28,10 +28,10 @@ public class UserServiceImpl implements UserService {
         selectCond.setCustomId(loginUser.getCustomId());
         List<MCustomInfo> lst = mCustomInfoMapper.select(selectCond);
         if (lst.size() < 3) {
-            for (int i = 0; i < 3 - lst.size(); i++) {
+            for (int i = lst.size(); i < 3; i++) {
                 MCustomInfo mCustomInfo = new MCustomInfo();
                 mCustomInfo.setCustomId(loginUser.getCustomId());
-                mCustomInfo.setRowNo(String.valueOf(lst.size() + i + 1));
+                mCustomInfo.setRowNo(String.valueOf(i + 1));
                 lst.add(mCustomInfo);
             }
         }
