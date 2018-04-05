@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.text.MessageFormat;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +24,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.rzsd.wechat.annotation.WebAuth;
 import com.rzsd.wechat.common.dto.TInvoice;
+import com.rzsd.wechat.common.dto.TShopItem;
 import com.rzsd.wechat.service.InvoiceService;
+import com.rzsd.wechat.service.ShopService;
 import com.rzsd.wechat.service.SystemService;
 import com.rzsd.wechat.service.UserService;
 import com.rzsd.wechat.util.DateUtil;
@@ -36,6 +39,8 @@ public class WebController {
     private InvoiceService invoiceServiceImpl;
     @Autowired
     private UserService userServiceImpl;
+    @Autowired
+    private ShopService shopServiceImpl;
     @Autowired
     private SystemService systemServiceImpl;
     @Value("${rzsd.output.file.path}")
@@ -163,4 +168,31 @@ public class WebController {
         return "regist";
     }
 
+    @RequestMapping(value = "shop/item_list")
+    public String shopItemList(@RequestParam(name = "shopId") String shopId,
+            @RequestParam(name = "itemName", required = false) String itemName, Model model,
+            HttpServletRequest request) {
+
+        TShopItem tShopItemCond = new TShopItem();
+        tShopItemCond.setShopId(new BigInteger(shopId));
+        if (!StringUtils.isEmpty(itemName)) {
+            tShopItemCond.setItemName(itemName);
+        }
+        model.addAttribute("shopItemLst", shopServiceImpl.selectShopItemWithItemInfo(tShopItemCond));
+        model.addAttribute("shopId", shopId);
+        return "item_list";
+    }
+
+    @RequestMapping(value = "shop/item_detail")
+    public String shopItemDetail(@RequestParam(name = "shopId") String shopId,
+            @RequestParam(name = "barcode") String barcode, Model model, HttpServletRequest request) {
+
+        TShopItem tShopItemCond = new TShopItem();
+        tShopItemCond.setShopId(new BigInteger(shopId));
+        tShopItemCond.setBarcode(barcode);
+        model.addAttribute("shopItem", shopServiceImpl.selectShopItemWithItemInfo(tShopItemCond).get(0));
+        model.addAttribute("shopInvoiceLst", shopServiceImpl.selectShopInvoiceByBarcode(shopId, barcode));
+        model.addAttribute("shopId", shopId);
+        return "item_detail";
+    }
 }

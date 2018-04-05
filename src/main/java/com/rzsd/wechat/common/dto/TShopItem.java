@@ -33,8 +33,26 @@ public class TShopItem extends BaseDataAccessDto {
         this.totalAmount = totalAmount;
     }
 
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public String getImgPath() {
+        return imgPath;
+    }
+
+    public void setImgPath(String imgPath) {
+        this.imgPath = imgPath;
+    }
+
     private BigInteger shopId;
     private String barcode;
     private BigInteger totalAmount;
+    private String itemName;
+    private String imgPath;
 
 }

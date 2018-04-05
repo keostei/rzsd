@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!-- saved from url=(0056)http://www.jpshpn.com/Home/ShopAct/index/c_id/17/s_id/18 -->
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>XM日韩代购库存明细</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/common.css" />
+    <link rel="stylesheet" href="/css/jquery.fileupload.css" />
+
+    <link rel="stylesheet" href="/css/layer.css" id="layuicss-skinlayercss" />
+    <script src="/js/load-image.all.min.js"></script>
+    <script src="/js/canvas-to-blob.min.js"></script>
+</head>
+    <body>
+	    <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="tab-content from_box mar_b50 clearfix" >
+                        <div role="tabpanel" class="tab-pane" id="home"></div>
+                        <div role="tabpanel" class="tab-pane active" id="activy">
+                            <div class="from_box_tit clearfix">
+                                <h4>库存明细</h4>
+                            </div>
+                            <div class="panel panel-success">
+                                <div class="panel-heading" th:text="${shopItem.barcode}">打包完成</div>
+                                <div class="panel-body">
+                                    <p><span th:text="${'商品名: ' + shopItem.itemName}">客户编码: AOKNS-01</span></p>
+                                    <p><span th:text="${'库存数量: ' + shopItem.totalAmount}">收件人: 张三</span></p>
+                                    <p><span th:text="${'库存更新: ' + #calendars.format(shopItem.updateTime, 'yyyy-MM-dd HH:mm')}">取件日期: 2017-10-02</span></p>
+                                </div>
+                            </div>
+                            <div th:each="shopInvoiceDetail,iterStat:${shopInvoiceLst}"
+                            class="panel"
+                            th:classappend="${shopInvoiceDetail.type=='1'}?'panel-success':'panel-danger'">
+                                <div class="panel-heading" th:text="${shopInvoiceDetail.type=='1'} ? '入库' :'出库'">入出库</div>
+                                <div class="panel-body">
+                                    <p><span th:text="${'数量：' + shopInvoiceDetail.count}">数量: 1</span></p>
+                                    <p><span th:text="${'事由：' + shopInvoiceDetail.reason}">事由: 批量入出库</span></p>
+                                    <p><span th:text="${'入出库时间：' + #calendars.format(shopInvoiceDetail.updateTime, 'yyyy-MM-dd HH:mm')}">入出库时间: 批量入出库</span></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">友情提示</label>
+                                <p>1.....</p>
+                                <p>2.....</p>
+                                <p>3.....</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

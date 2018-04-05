@@ -21,6 +21,28 @@
         </if>
     </select>
 
+    <select id="selectShopItemWithItemInfo" parameterType="tShopItem" resultType="tShopItem">
+        SELECT 
+            t.barcode,
+            t.total_amount,
+            t.update_time,
+            CASE WHEN m.item_name IS NULL THEN '商品名未设置' ELSE m.item_name END AS item_name ,
+            m.img_path 
+        FROM
+            t_shop_item t 
+            LEFT JOIN m_shop_item m 
+                ON t.shop_id = m.shop_id 
+                AND t.barcode = m.barcode 
+        WHERE 1 = 1 
+            AND t.del_flg = '0'
+            AND t.shop_id = #{shopId}
+            <if test="barcode != null">AND t.barcode = #{barcode}</if>
+            <if test="itemName != null">AND (t.barcode LIKE concat(concat('%',#{itemName}),'%')
+            OR m.item_name LIKE concat(concat('%',#{itemName}),'%'))
+            </if>
+        ORDER BY t.update_time DESC, t.barcode
+    </select>
+    
     <insert id="insert" parameterType="tShopItem">
         INSERT
         INTO t_shop_item(

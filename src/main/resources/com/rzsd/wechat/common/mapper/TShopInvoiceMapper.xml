@@ -1,7 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.rzsd.wechat.common.mapper.TShopInvoiceMapper">
-    <insert id="insert" parameterType="tInvoice">
+    <select id="select" parameterType="tShopInvoice" resultType="tShopInvoice">
+        select *
+        from t_shop_invoice
+        where
+        1=1
+        <if test="shopId != null">and shop_id = #{shopId}</if>
+        <if test="barcode != null">and barcode = #{barcode}</if>
+        <if test="count != null">and count = #{count}</if>
+        <if test="type != null">and type = #{type}</if>
+        <if test="reason != null">and reason = #{reason}</if>
+        <if test="delFlg != null">and del_flg = #{delFlg}</if>
+        <if test="createTime != null">and create_time = #{createTime}</if>
+        <if test="createId != null">and create_id = #{createId}</if>
+        <if test="updateTime != null">and update_time = #{updateTime}</if>
+        <if test="updateId != null">and update_id = #{updateId}</if>
+        <if test="orderByStr != null">ORDER BY ${orderByStr}</if>
+        <if test="limitCnt != null">
+            limit ${limitCnt}
+            <if test="offsetRowNum != null">offset ${offsetRowNum}</if>
+        </if>
+    </select>
+    
+    <insert id="insert" parameterType="tShopInvoice">
         INSERT
         INTO t_shop_invoice(
         shop_id

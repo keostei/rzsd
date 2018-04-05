@@ -1,10 +1,12 @@
 package com.rzsd.wechat.common.mapper;
 
+import java.util.List;
+
 import com.rzsd.wechat.common.dto.TShopInvoice;
 
 public interface TShopInvoiceMapper {
 
-    // List<TInvoice> select(TInvoice selectCond);
+    List<TShopInvoice> select(TShopInvoice tShopInvoiceCond);
 
     int insert(TShopInvoice tShopInvoice);
 

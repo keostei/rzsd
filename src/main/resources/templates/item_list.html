@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<!-- saved from url=(0056)http://www.jpshpn.com/Home/ShopAct/index/c_id/17/s_id/18 -->
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>XM日韩代购库存管理</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+        <link rel="stylesheet" href="/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="/css/common.css" />
+        <link rel="stylesheet" href="/css/jquery.fileupload.css" />
+        <link rel="stylesheet" href="/css/bootstrap-select.min.css" />
+        <script src="/js/jquery-2.1.1.min.js"></script>
+        <script src="/js/load-image.all.min.js"></script>
+        <script src="/js/canvas-to-blob.min.js"></script>
+        <script src="/js/jquery.ui.widget.js"></script>
+        <script src="/js/bootstrap.min.js"></script>
+        <script type="text/ecmascript" src="/js/bootstrap-select.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="tab-content from_box mar_b50 clearfix" >
+                        <div role="tabpanel" class="tab-pane active" id="chaxun">
+                            <div class="from_box_tit clearfix">
+                                <h4>库存汇总</h4>
+                            </div>
+                            <div th:each="shopItem,iterStat:${shopItemLst}" class="panel panel-success" 
+                                th:onclick="${'window.location.href=''item_detail?shopId=' + shopId + '&amp;barcode=' + shopItem.barcode + ''';'}">
+                                <div class="panel-heading" th:text="${shopItem.barcode}">BARCODE</div>
+                                <div class="panel-body">
+                                    <p><span th:text="${'商品名: ' + shopItem.itemName}">客户编码: AOKNS-01</span></p>
+                                    <p><span th:text="${'库存数量: ' + shopItem.totalAmount}">收件人: 张三</span></p>
+                                    <p><span th:text="${'库存更新: ' + #calendars.format(shopItem.updateTime, 'yyyy-MM-dd HH:mm:ss')}">取件日期: 2017-10-02</span></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">友情提示</label>
+                                <p>1...... </p>
+                                <p>2...... </p>
+                                <p>3......</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

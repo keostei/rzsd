@@ -62,4 +62,19 @@ public class ShopServiceImpl implements ShopService {
         return cnt;
     }
 
+    @Override
+    public List<TShopItem> selectShopItemWithItemInfo(TShopItem tShopItemCond) {
+        return tShopItemMapper.selectShopItemWithItemInfo(tShopItemCond);
+    }
+
+    @Override
+    public List<TShopInvoice> selectShopInvoiceByBarcode(String shopId, String barcode) {
+        TShopInvoice tShopInvoiceCond = new TShopInvoice();
+        tShopInvoiceCond.setShopId(new BigInteger(shopId));
+        tShopInvoiceCond.setBarcode(barcode);
+        tShopInvoiceCond.setDelFlg("0");
+        tShopInvoiceCond.setOrderByStr("shop_invoice_id DESC ");
+        return tShopInvoiceMapper.select(tShopInvoiceCond);
+    }
+
 }
