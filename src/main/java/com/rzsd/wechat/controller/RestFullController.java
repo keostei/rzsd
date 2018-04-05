@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,21 +31,27 @@ import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rzsd.wechat.annotation.WebAuth;
+import com.rzsd.wechat.common.constrant.RzConst;
 import com.rzsd.wechat.common.dto.BaseJsonDto;
 import com.rzsd.wechat.common.dto.InvoiceData;
 import com.rzsd.wechat.common.dto.MCustomInfo;
 import com.rzsd.wechat.common.dto.TInvoice;
+import com.rzsd.wechat.common.dto.TShopInvoice;
+import com.rzsd.wechat.entity.BarCodeItem;
+import com.rzsd.wechat.entity.BulkShopInvoice;
 import com.rzsd.wechat.entity.InvoiceDeliver;
 import com.rzsd.wechat.entity.LoginUser;
 import com.rzsd.wechat.exception.BussinessException;
 import com.rzsd.wechat.form.ImportDataForm;
 import com.rzsd.wechat.service.InvoiceService;
 import com.rzsd.wechat.service.LoginService;
+import com.rzsd.wechat.service.ShopService;
 import com.rzsd.wechat.service.SystemService;
 import com.rzsd.wechat.service.UserService;
 import com.rzsd.wechat.util.DateUtil;
@@ -64,6 +71,8 @@ public class RestFullController {
     private SystemService systemServiceImpl;
     @Autowired
     private LoginService loginServiceImpl;
+    @Autowired
+    private ShopService shopServiceImpl;
 
     @Value("${rzsd.output.template.path}")
     private String templatePath;
@@ -457,6 +466,37 @@ public class RestFullController {
             e.printStackTrace();
         }
         BaseJsonDto result = new BaseJsonDto();
+        result.setFail(false);
+        return result;
+    }
+
+    @RequestMapping("/shop/upload_invoice")
+    public BaseJsonDto uploadInvoice(@RequestBody BulkShopInvoice bulkShopInvoice) {
+        BaseJsonDto result = new BaseJsonDto();
+        List<TShopInvoice> tShopInvoiceLst = new ArrayList<>();
+        TShopInvoice t;
+        String msg = "";
+        for (BarCodeItem bci : bulkShopInvoice.getBarCodeItemLst()) {
+            if (StringUtils.isEmpty(bci.getResult())) {
+                continue;
+            }
+            if (!"EAN13".equals(bci.getType())) {
+                continue;
+            }
+            t = new TShopInvoice();
+            t.setShopId(new BigInteger(String.valueOf(bulkShopInvoice.getShopId())));
+            t.setBarcode(bci.getResult());
+            t.setCount(new BigInteger("1"));
+            t.setType(bulkShopInvoice.getType());
+            t.setReason(bulkShopInvoice.getReason());
+            t.setCreateId(RzConst.SYS_ADMIN_ID);
+            t.setUpdateId(RzConst.SYS_ADMIN_ID);
+            tShopInvoiceLst.add(t);
+        }
+        int insertCnt = shopServiceImpl.bulkInsertShopInvoice(tShopInvoiceLst);
+
+        result.setOptStr(
+                msg + "本次成功上传" + insertCnt + "件" + ("1".equals(bulkShopInvoice.getType()) ? "入库" : "出库") + "记录。");
         result.setFail(false);
         return result;
     }

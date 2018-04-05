@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rzsd.wechat.common.mapper.TShopItemMapper">
+    <select id="select" parameterType="tShopItem" resultType="tShopItem">
+        select *
+        from t_shop_item
+        where
+        1=1
+        <if test="shopId != null">and shop_id = #{shopId}</if>
+        <if test="barcode != null">and barcode = #{barcode}</if>
+        <if test="totalAmount != null">and total_amount = #{totalAmount}</if>
+        <if test="delFlg != null">and del_flg = #{delFlg}</if>
+        <if test="createTime != null">and create_time = #{createTime}</if>
+        <if test="createId != null">and create_id = #{createId}</if>
+        <if test="updateTime != null">and update_time = #{updateTime}</if>
+        <if test="updateId != null">and update_id = #{updateId}</if>
+        <if test="orderByStr != null">ORDER BY ${orderByStr}</if>
+        <if test="limitCnt != null">
+            limit ${limitCnt}
+            <if test="offsetRowNum != null">offset ${offsetRowNum}</if>
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="tShopItem">
+        INSERT
+        INTO t_shop_item(
+        shop_id
+        <if test="barcode != null">, barcode</if>
+        <if test="totalAmount != null">, total_amount</if>
+        <if test="delFlg != null">, del_flg</if>
+        <if test="createTime != null">, create_time</if>
+        <if test="createId != null">, create_id</if>
+        <if test="updateTime != null">, update_time</if>
+        <if test="updateId != null">, update_id</if>
+        )
+        VALUES (
+        #{shopId}
+        <if test="barcode != null">, #{barcode}</if>
+        <if test="totalAmount != null">, #{totalAmount}</if>
+        <if test="delFlg != null">, #{delFlg}</if>
+        <if test="createTime != null">, #{createTime}</if>
+        <if test="createId != null">, #{createId}</if>
+        <if test="updateTime != null">, #{updateTime}</if>
+        <if test="updateId != null">, #{updateId}</if>
+        )
+    </insert>
+
+    <update id="update" parameterType="tShopItem">
+        UPDATE t_shop_item
+        SET
+        shop_id = #{shopId}
+        <if test="barcode != null">, barcode = #{barcode}</if>
+        <if test="totalAmount != null">, total_amount = #{totalAmount}</if>
+        <if test="delFlg != null">, del_flg = #{delFlg}</if>
+        <if test="createTime != null">, create_time = #{createTime}</if>
+        <if test="createId != null">, create_id = #{createId}</if>
+        <if test="updateTime != null">, update_time = #{updateTime}</if>
+        <if test="updateId != null">, update_id = #{updateId}</if>
+        WHERE
+        1=1
+        <if test="shopId != null">and shop_id = #{shopId}</if>
+        <if test="barcode != null">and barcode = #{barcode}</if>
+    </update>
+
+</mapper>
