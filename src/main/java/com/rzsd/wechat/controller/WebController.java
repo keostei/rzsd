@@ -180,6 +180,7 @@ public class WebController {
         }
         model.addAttribute("shopItemLst", shopServiceImpl.selectShopItemWithItemInfo(tShopItemCond));
         model.addAttribute("shopId", shopId);
+        model.addAttribute("itemName", itemName);
         return "item_list";
     }
 

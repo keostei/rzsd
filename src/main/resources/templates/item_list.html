@@ -27,6 +27,24 @@
                             <div class="from_box_tit clearfix">
                                 <h4>库存汇总</h4>
                             </div>
+                            <div class="row">
+	                            <form>
+	                            <div class="col-xs-10" style="padding-right:0px;">
+	                                <input type="search" name="itemName" th:value="${itemName}" placeholder="请输入商品名检索"
+	                                style="height:40px;width: 100%;font-size: 18px;
+	                                background-color: rgba(255,255,255,.95);border: 1px solid #fff;
+	                                " />
+	                            </div>
+	                            <input type="hidden" th:value="${shopId}" name="shopId" />
+	                            <div class="col-xs-2" style="padding-left:0px;">
+	                                <input type="submit" value="" 
+	                                style="background:url(/img/searchbt.png) center no-repeat;
+	                                background-size:100%;height:40px;width:40px;
+	                                border-style:none;"/>
+	                            </div>
+	                            <div class="clear:both"></div>
+	                            </form>
+                            </div>
                             <div th:each="shopItem,iterStat:${shopItemLst}" class="panel panel-success" 
                                 th:onclick="${'window.location.href=''item_detail?shopId=' + shopId + '&amp;barcode=' + shopItem.barcode + ''';'}">
                                 <div class="panel-heading" th:text="${shopItem.barcode}">BARCODE</div>
