@@ -23,6 +23,23 @@
         </if>
     </select>
     
+    <select id="selectShopInvoiceSum" parameterType="tShopSum" resultType="tShopSum">
+        select
+  			a.barcode
+  			, b.item_name
+  			, b.price_rmb
+  			, b.price_show
+  			, sum(a.count) as sum_cnt 
+		from t_shop_invoice a 
+  			left join m_shop_item b 
+    		on a.shop_id = b.shop_id 
+    		and a.barcode = b.barcode 
+		where
+  			a.shop_id = #{shopId}
+  			and a.type = '2' 
+		group by a.barcode, b.item_name, b.price_rmb, b.price_show
+    </select>
+    
     <insert id="insert" parameterType="tShopInvoice">
         INSERT
         INTO t_shop_invoice(

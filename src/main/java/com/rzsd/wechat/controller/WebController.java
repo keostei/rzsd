@@ -7,8 +7,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.MessageFormat;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.rzsd.wechat.annotation.WebAuth;
 import com.rzsd.wechat.common.dto.TInvoice;
 import com.rzsd.wechat.common.dto.TShopItem;
+import com.rzsd.wechat.common.dto.TShopSum;
 import com.rzsd.wechat.service.InvoiceService;
 import com.rzsd.wechat.service.ShopService;
 import com.rzsd.wechat.service.SystemService;
@@ -195,5 +198,32 @@ public class WebController {
         model.addAttribute("shopInvoiceLst", shopServiceImpl.selectShopInvoiceByBarcode(shopId, barcode));
         model.addAttribute("shopId", shopId);
         return "item_detail";
+    }
+
+    @RequestMapping(value = "shop/item_sum")
+    public String shopItemSum(@RequestParam(name = "shopId") String shopId,
+            @RequestParam(name = "dateFrom", required = false) String dateFrom,
+            @RequestParam(name = "dateTo", required = false) String dateTo, Model model, HttpServletRequest request) {
+
+        TShopSum tShopSumCond = new TShopSum();
+        tShopSumCond.setShopId(new BigInteger(shopId));
+        /*
+         * if (!StringUtils.isEmpty(dateFrom)) { tShopItemCond.setItemName(itemName); }
+         */
+        List<TShopSum> tShopSumLst = shopServiceImpl.selectShopSum(tShopSumCond);
+        BigInteger totalCnt = new BigInteger("0");
+        BigDecimal totalPriceRmb = BigDecimal.ZERO;
+        BigDecimal totalPriceShow = BigDecimal.ZERO;
+        for (TShopSum tss : tShopSumLst) {
+            totalCnt = totalCnt.add(tss.getSumCnt());
+            totalPriceRmb = totalPriceRmb.add(tss.getPriceRmbSum());
+            totalPriceShow = totalPriceShow.add(tss.getPriceShowSum());
+        }
+        model.addAttribute("shopItemSum", tShopSumLst);
+        model.addAttribute("shopId", shopId);
+        model.addAttribute("totalCnt", totalCnt);
+        model.addAttribute("totalPriceRmb", totalPriceRmb);
+        model.addAttribute("totalPriceShow", totalPriceShow);
+        return "item_sum";
     }
 }

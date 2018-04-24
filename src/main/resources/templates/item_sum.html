@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<!-- saved from url=(0056)http://www.jpshpn.com/Home/ShopAct/index/c_id/17/s_id/18 -->
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>XM日韩代购库存管理</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+        <link rel="stylesheet" href="/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="/css/common.css" />
+        <link rel="stylesheet" href="/css/jquery.fileupload.css" />
+        <link rel="stylesheet" href="/css/bootstrap-select.min.css" />
+        <script src="/js/jquery-2.1.1.min.js"></script>
+        <script src="/js/load-image.all.min.js"></script>
+        <script src="/js/canvas-to-blob.min.js"></script>
+        <script src="/js/jquery.ui.widget.js"></script>
+        <script src="/js/bootstrap.min.js"></script>
+        <script type="text/ecmascript" src="/js/bootstrap-select.min.js"></script>
+    </head>
+    <body style="background:#D74B28">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="tab-content from_box mar_b50 clearfix" >
+                        <div role="tabpanel" class="tab-pane active" id="chaxun">
+                            <div class="from_box_tit clearfix">
+                                <h4>销售报表</h4>
+                            </div>
+                            <div class="form-group">
+	                            <form>
+	                            <label class="control-label">开始日期</label>
+	                            <input type="date" id="dateFrom" class="form-control" style="-webkit-appearance: none;line-height: 20px" />
+	                            <label class="control-label">结束日期</label>
+	                            <input type="date" id="dateTo" class="form-control" style="-webkit-appearance: none;line-height: 20px" />
+	                            <input type="submit" name="sub" class="btn btn-default col-xs-12" id="btnAppointment" value="统计报表" />
+	                            
+	                            <!-- <div class="col-xs-10" style="padding-right:0px;">
+	                                <input type="search" name="itemName" th:value="${itemName}" placeholder="请输入商品名检索"
+	                                style="height:40px;width: 100%;font-size: 18px;
+	                                background-color: rgba(255,255,255,.95);border: 1px solid #fff;
+	                                " />
+	                            </div>
+	                            <input type="hidden" th:value="${shopId}" name="shopId" />
+	                            <div class="col-xs-2" style="padding-left:0px;">
+	                                <input type="submit" value="" 
+	                                style="background:url(/img/searchbt.png) center no-repeat;
+	                                background-size:100%;height:40px;width:40px;
+	                                border-style:none;"/>
+	                            </div>
+	                            <div class="clear:both"></div> -->
+	                            </form>
+	                            <div class="clear:both"></div>
+                            </div>
+                            <div class="panel panel-danger">
+                                <div class="panel-heading" >汇总</div>
+                                <div class="panel-body">
+                                    <p><span th:text="${'出库总件数: ' + totalCnt}">客户编码: AOKNS-01</span></p>
+                                    <p><span th:text="${'入库总金额: ' + totalPriceRmb}">收件人: 张三</span></p>
+                                    <p><span th:text="${'出库总金额: ' + totalPriceShow}">取件日期: 2017-10-02</span></p>
+                                </div>
+                            </div>
+                            <div th:each="shopItem,iterStat:${shopItemSum}" class="panel panel-success">
+                                <div class="panel-heading" th:text="${shopItem.barcode}">BARCODE</div>
+                                <div class="panel-body">
+                                    <p><span th:text="${'商品名: ' + shopItem.itemName}">客户编码: AOKNS-01</span></p>
+                                    <p><span th:text="${'出库数量: ' + shopItem.sumCnt}">收件人: 张三</span></p>
+                                    <p><span th:text="${'入库金额: ' + shopItem.priceRmbSum}">取件日期: 2017-10-02</span></p>
+                                    <p><span th:text="${'出库金额: ' + shopItem.priceShowSum}">取件日期: 2017-10-02</span></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">友情提示</label>
+                                <p>1...... </p>
+                                <p>2...... </p>
+                                <p>3......</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,5 +1,6 @@
 package com.rzsd.wechat.service;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.rzsd.wechat.common.constrant.RzConst;
 import com.rzsd.wechat.common.dto.TShopInvoice;
 import com.rzsd.wechat.common.dto.TShopItem;
+import com.rzsd.wechat.common.dto.TShopSum;
 import com.rzsd.wechat.common.mapper.TShopInvoiceMapper;
 import com.rzsd.wechat.common.mapper.TShopItemMapper;
 import com.rzsd.wechat.util.DateUtil;
@@ -78,6 +80,25 @@ public class ShopServiceImpl implements ShopService {
         tShopInvoiceCond.setDelFlg("0");
         tShopInvoiceCond.setOrderByStr("shop_invoice_id DESC ");
         return tShopInvoiceMapper.select(tShopInvoiceCond);
+    }
+
+    @Override
+    public List<TShopSum> selectShopSum(TShopSum tShopSumCond) {
+        List<TShopSum> tShopSumLst = tShopInvoiceMapper.selectShopInvoiceSum(tShopSumCond);
+        for (TShopSum tss : tShopSumLst) {
+            if (tss.getItemName() == null) {
+                tss.setItemName("商品名未设置");
+            }
+            if (tss.getPriceRmb() == null) {
+                tss.setPriceRmb(BigDecimal.ZERO);
+            }
+            if (tss.getPriceShow() == null) {
+                tss.setPriceShow(BigDecimal.ZERO);
+            }
+            tss.setPriceRmbSum(tss.getPriceRmb().multiply(new BigDecimal(tss.getSumCnt())));
+            tss.setPriceShowSum(tss.getPriceShow().multiply(new BigDecimal(tss.getSumCnt())));
+        }
+        return tShopSumLst;
     }
 
 }
