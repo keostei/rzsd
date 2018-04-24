@@ -37,13 +37,15 @@ public class ShopServiceImpl implements ShopService {
             tShopItemCond.setBarcode(t.getBarcode());
             List<TShopItem> lst = tShopItemMapper.select(tShopItemCond);
             BigInteger updAmount;
+            // 批量入库
             if ("1".equals(t.getType())) {
                 updAmount = t.getCount();
             } else {
                 updAmount = t.getCount().multiply(new BigInteger("-1"));
             }
+            TShopItem tShopItem;
             if (lst.isEmpty()) {
-                TShopItem tShopItem = new TShopItem();
+                tShopItem = new TShopItem();
                 tShopItem.setShopId(t.getShopId());
                 tShopItem.setBarcode(t.getBarcode());
                 tShopItem.setTotalAmount(updAmount);
@@ -51,12 +53,13 @@ public class ShopServiceImpl implements ShopService {
                 tShopItem.setUpdateId(RzConst.SYS_ADMIN_ID);
                 tShopItemMapper.insert(tShopItem);
             } else {
-                TShopItem tShopItem = lst.get(0);
+                tShopItem = lst.get(0);
                 tShopItem.setTotalAmount(tShopItem.getTotalAmount().add(updAmount));
                 tShopItem.setUpdateId(RzConst.SYS_ADMIN_ID);
                 tShopItem.setUpdateTime(DateUtil.getCurrentTimestamp());
                 tShopItemMapper.update(tShopItem);
             }
+
             LOGGER.info("[入出库批量登录]登录成功");
         }
         return cnt;

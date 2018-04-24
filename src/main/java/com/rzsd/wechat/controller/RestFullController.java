@@ -486,12 +486,30 @@ public class RestFullController {
             t = new TShopInvoice();
             t.setShopId(new BigInteger(String.valueOf(bulkShopInvoice.getShopId())));
             t.setBarcode(bci.getResult());
-            t.setCount(new BigInteger("1"));
-            t.setType(bulkShopInvoice.getType());
-            t.setReason(bulkShopInvoice.getReason());
+            t.setCount(new BigInteger(String.valueOf(bci.getCnt())));
+            if ("3".equals(bulkShopInvoice.getType())) {
+                t.setType("1");
+                t.setReason(bulkShopInvoice.getReason() + "-入库");
+            } else {
+                t.setType(bulkShopInvoice.getType());
+                t.setReason(bulkShopInvoice.getReason());
+            }
             t.setCreateId(RzConst.SYS_ADMIN_ID);
             t.setUpdateId(RzConst.SYS_ADMIN_ID);
             tShopInvoiceLst.add(t);
+
+            // 直接出库的时候，自动出库
+            if ("3".equals(bulkShopInvoice.getType())) {
+                t = new TShopInvoice();
+                t.setShopId(new BigInteger(String.valueOf(bulkShopInvoice.getShopId())));
+                t.setBarcode(bci.getResult());
+                t.setCount(new BigInteger(String.valueOf(bci.getCnt())));
+                t.setType("2");
+                t.setReason(bulkShopInvoice.getReason() + "-出库");
+                t.setCreateId(RzConst.SYS_ADMIN_ID);
+                t.setUpdateId(RzConst.SYS_ADMIN_ID);
+                tShopInvoiceLst.add(t);
+            }
         }
         int insertCnt = shopServiceImpl.bulkInsertShopInvoice(tShopInvoiceLst);
 

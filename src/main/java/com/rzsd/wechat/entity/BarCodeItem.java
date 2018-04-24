@@ -11,6 +11,8 @@ public class BarCodeItem implements Serializable {
     private String type;
     private String result;
     private String file;
+    private int cnt;
+    private String dt;
 
     public String getType() {
         return type;
@@ -36,4 +38,19 @@ public class BarCodeItem implements Serializable {
         this.file = file;
     }
 
+    public int getCnt() {
+        return cnt;
+    }
+
+    public void setCnt(int cnt) {
+        this.cnt = cnt;
+    }
+
+    public String getDt() {
+        return dt;
+    }
+
+    public void setDt(String dt) {
+        this.dt = dt;
+    }
 }
