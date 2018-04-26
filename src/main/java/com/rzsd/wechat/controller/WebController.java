@@ -210,11 +210,11 @@ public class WebController {
 
         if (StringUtils.isEmpty(dateFrom)) {
             dateTo = DateUtil.format(DateUtil.getCurrentTimestamp());
-            tShopSumCond.setDateTo(DateUtil.parse(dateTo));
+            tShopSumCond.setDateTo(DateUtil.addDays(DateUtil.parse(dateTo), 1));
             tShopSumCond.setDateFrom(DateUtil.addDays(tShopSumCond.getDateTo(), -30));
             dateFrom = DateUtil.format(tShopSumCond.getDateFrom());
         } else {
-            tShopSumCond.setDateTo(DateUtil.parse(dateTo));
+            tShopSumCond.setDateTo(DateUtil.addDays(DateUtil.parse(dateTo), 1));
             tShopSumCond.setDateFrom(DateUtil.parse(dateFrom));
         }
 
