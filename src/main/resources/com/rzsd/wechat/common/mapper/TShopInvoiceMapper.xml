@@ -37,6 +37,12 @@
 		where
   			a.shop_id = #{shopId}
   			and a.type = '2' 
+  			<if test="dateFrom != null">
+  			and a.create_time <![CDATA[>=]]> #{dateFrom}
+  			</if>
+  			<if test="dateTo != null">
+  			and a.create_time <![CDATA[<=]]> #{dateTo}
+  			</if>
 		group by a.barcode, b.item_name, b.price_rmb, b.price_show
     </select>
     

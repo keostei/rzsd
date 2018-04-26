@@ -3,7 +3,6 @@ package com.rzsd.wechat.schedule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.rzsd.wechat.enmu.InvoiceStatus;
@@ -17,7 +16,7 @@ public class RzsdSchedule {
     @Autowired
     private InvoiceService invoiceServiceImpl;
 
-    @Scheduled(cron = "0 0 * * * ?")
+    // @Scheduled(cron = "0 0 * * * ?")
     public void UpdateStatus1() {
         LOGGER.info("状态更新开始：出库---日本通关中");
         invoiceServiceImpl.doUpdateDetailStatus(InvoiceStatus.CHUKU.getCode(), DateUtil.getCurrentTimestamp(),
@@ -25,7 +24,7 @@ public class RzsdSchedule {
         LOGGER.info("状态更新结束：出库---日本通关中");
     }
 
-    @Scheduled(cron = "0 5 * * * ?")
+    // @Scheduled(cron = "0 5 * * * ?")
     public void UpdateStatus2() {
         LOGGER.info("状态更新开始：日本通关中---专机起飞");
         invoiceServiceImpl.doUpdateDetailStatus(InvoiceStatus.RBTGZ.getCode(), DateUtil.getCurrentTimestamp(),
@@ -33,7 +32,7 @@ public class RzsdSchedule {
         LOGGER.info("状态更新结束：日本通关中---专机起飞");
     }
 
-    @Scheduled(cron = "0 10 * * * ?")
+    // @Scheduled(cron = "0 10 * * * ?")
     public void UpdateStatus3() {
         LOGGER.info("状态更新开始：专机起飞---清关口岸");
         invoiceServiceImpl.doUpdateDetailStatus(InvoiceStatus.ZJQF.getCode(),

@@ -207,9 +207,17 @@ public class WebController {
 
         TShopSum tShopSumCond = new TShopSum();
         tShopSumCond.setShopId(new BigInteger(shopId));
-        /*
-         * if (!StringUtils.isEmpty(dateFrom)) { tShopItemCond.setItemName(itemName); }
-         */
+
+        if (StringUtils.isEmpty(dateFrom)) {
+            dateTo = DateUtil.format(DateUtil.getCurrentTimestamp());
+            tShopSumCond.setDateTo(DateUtil.parse(dateTo));
+            tShopSumCond.setDateFrom(DateUtil.addDays(tShopSumCond.getDateTo(), -30));
+            dateFrom = DateUtil.format(tShopSumCond.getDateFrom());
+        } else {
+            tShopSumCond.setDateTo(DateUtil.parse(dateTo));
+            tShopSumCond.setDateFrom(DateUtil.parse(dateFrom));
+        }
+
         List<TShopSum> tShopSumLst = shopServiceImpl.selectShopSum(tShopSumCond);
         BigInteger totalCnt = new BigInteger("0");
         BigDecimal totalPriceRmb = BigDecimal.ZERO;
@@ -221,6 +229,8 @@ public class WebController {
         }
         model.addAttribute("shopItemSum", tShopSumLst);
         model.addAttribute("shopId", shopId);
+        model.addAttribute("dateFrom", dateFrom);
+        model.addAttribute("dateTo", dateTo);
         model.addAttribute("totalCnt", totalCnt);
         model.addAttribute("totalPriceRmb", totalPriceRmb);
         model.addAttribute("totalPriceShow", totalPriceShow);

@@ -30,27 +30,15 @@
                             <div class="form-group">
 	                            <form>
 	                            <label class="control-label">开始日期</label>
-	                            <input type="date" id="dateFrom" class="form-control" style="-webkit-appearance: none;line-height: 20px" />
+	                            <input type="date" id="dateFrom" name="dateFrom" class="form-control" style="-webkit-appearance: none;line-height: 20px" th:value="${dateFrom}" />
 	                            <label class="control-label">结束日期</label>
-	                            <input type="date" id="dateTo" class="form-control" style="-webkit-appearance: none;line-height: 20px" />
-	                            <input type="submit" name="sub" class="btn btn-default col-xs-12" id="btnAppointment" value="统计报表" />
-	                            
-	                            <!-- <div class="col-xs-10" style="padding-right:0px;">
-	                                <input type="search" name="itemName" th:value="${itemName}" placeholder="请输入商品名检索"
-	                                style="height:40px;width: 100%;font-size: 18px;
-	                                background-color: rgba(255,255,255,.95);border: 1px solid #fff;
-	                                " />
-	                            </div>
+	                            <input type="date" id="dateTo" name="dateTo" class="form-control" style="-webkit-appearance: none;line-height: 20px" th:value="${dateTo}" />
 	                            <input type="hidden" th:value="${shopId}" name="shopId" />
-	                            <div class="col-xs-2" style="padding-left:0px;">
-	                                <input type="submit" value="" 
-	                                style="background:url(/img/searchbt.png) center no-repeat;
-	                                background-size:100%;height:40px;width:40px;
-	                                border-style:none;"/>
-	                            </div>
-	                            <div class="clear:both"></div> -->
-	                            </form>
+	                            <input type="submit" class="btn btn-default" id="btnAppointment" style="background: #d74b28;color: white;width: 100%;margin-top: 5px;" value="统计报表" />
+	                            <!-- <div class="col-xs-12"></div> -->
 	                            <div class="clear:both"></div>
+	                            </form>
+	                            <!-- <div class="clear:both"></div> -->
                             </div>
                             <div class="panel panel-danger">
                                 <div class="panel-heading" >汇总</div>
