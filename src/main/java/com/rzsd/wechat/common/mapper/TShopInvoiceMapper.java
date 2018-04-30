@@ -13,7 +13,7 @@ public interface TShopInvoiceMapper {
 
     List<TShopSum> selectShopInvoiceSum(TShopSum tShopSumCond);
 
-    // int update(TInvoice tInvoice);
+    int update(TShopInvoice tShopInvoice);
 
     // List<TInvoice> getPersonalInvoice(TInvoice selectCond);
 

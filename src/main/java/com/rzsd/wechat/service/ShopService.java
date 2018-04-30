@@ -1,5 +1,6 @@
 package com.rzsd.wechat.service;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import com.rzsd.wechat.common.dto.TShopInvoice;
@@ -15,4 +16,8 @@ public interface ShopService {
     List<TShopInvoice> selectShopInvoiceByBarcode(String shopId, String barcode);
 
     List<TShopSum> selectShopSum(TShopSum tShopSumCond);
+
+    int updateItemName(BigInteger shopId, String barCode, String itemName);
+
+    int delShopInvoice(BigInteger shopInvoiceId);
 }

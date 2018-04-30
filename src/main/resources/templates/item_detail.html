@@ -12,7 +12,10 @@
     <link rel="stylesheet" href="/css/jquery.fileupload.css" />
 
     <link rel="stylesheet" href="/css/layer.css" id="layuicss-skinlayercss" />
+    <script src="/js/jquery-2.1.1.min.js"></script>
     <script src="/js/load-image.all.min.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/item_detail.js"></script>
     <script src="/js/canvas-to-blob.min.js"></script>
 </head>
     <body style="background:#D74B28">
@@ -37,7 +40,11 @@
                             <div th:each="shopInvoiceDetail,iterStat:${shopInvoiceLst}"
                             class="panel"
                             th:classappend="${shopInvoiceDetail.type=='1'}?'panel-success':'panel-danger'">
-                                <div class="panel-heading" th:text="${shopInvoiceDetail.type=='1'} ? '入库' :'出库'">入出库</div>
+                            	<div class="panel-heading clearfix">
+                            		<div class="col-xs-10" th:text="${shopInvoiceDetail.type=='1'} ? '入库' :'出库'">入出库</div>
+                                	<div class="col-xs-2 invoice-del" >删</div>
+                                	<input type="hidden" th:value="${shopInvoiceDetail.shopInvoiceId}" />
+                                </div>
                                 <div class="panel-body">
                                     <p><span th:text="${'数量：' + shopInvoiceDetail.count}">数量: 1</span></p>
                                     <p><span th:text="${'事由：' + shopInvoiceDetail.reason}">事由: 批量入出库</span></p>

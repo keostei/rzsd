@@ -519,6 +519,23 @@ public class RestFullController {
         return result;
     }
 
+    @RequestMapping("/shop/update_item_name")
+    public BaseJsonDto updateItemName(HttpServletRequest request, HttpServletResponse response) {
+        BaseJsonDto result = new BaseJsonDto();
+        shopServiceImpl.updateItemName(new BigInteger(request.getParameter("shopId")), request.getParameter("barCode"),
+                request.getParameter("itemName"));
+        result.setFail(false);
+        return result;
+    }
+
+    @RequestMapping("/shop/del_shop_item_invoice")
+    public BaseJsonDto delShopItemInvoice(HttpServletRequest request, HttpServletResponse response) {
+        BaseJsonDto result = new BaseJsonDto();
+        shopServiceImpl.delShopInvoice(new BigInteger(request.getParameter("shopInvoiceId")));
+        result.setFail(false);
+        return result;
+    }
+
     @ExceptionHandler(BussinessException.class) // (1)
     @ResponseStatus(value = HttpStatus.CONFLICT) // (2)
     public BaseJsonDto handleBindException(BussinessException e) { // (4)

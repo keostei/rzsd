@@ -1,76 +1,103 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.rzsd.wechat.common.mapper.TShopInvoiceMapper">
-    <select id="select" parameterType="tShopInvoice" resultType="tShopInvoice">
-        select *
-        from t_shop_invoice
-        where
-        1=1
-        <if test="shopId != null">and shop_id = #{shopId}</if>
-        <if test="barcode != null">and barcode = #{barcode}</if>
-        <if test="count != null">and count = #{count}</if>
-        <if test="type != null">and type = #{type}</if>
-        <if test="reason != null">and reason = #{reason}</if>
-        <if test="delFlg != null">and del_flg = #{delFlg}</if>
-        <if test="createTime != null">and create_time = #{createTime}</if>
-        <if test="createId != null">and create_id = #{createId}</if>
-        <if test="updateTime != null">and update_time = #{updateTime}</if>
-        <if test="updateId != null">and update_id = #{updateId}</if>
-        <if test="orderByStr != null">ORDER BY ${orderByStr}</if>
-        <if test="limitCnt != null">
-            limit ${limitCnt}
-            <if test="offsetRowNum != null">offset ${offsetRowNum}</if>
-        </if>
-    </select>
-    
-    <select id="selectShopInvoiceSum" parameterType="tShopSum" resultType="tShopSum">
-        select
-  			a.barcode
-  			, b.item_name
-  			, b.price_rmb
-  			, b.price_show
-  			, sum(a.count) as sum_cnt 
-		from t_shop_invoice a 
-  			left join m_shop_item b 
-    		on a.shop_id = b.shop_id 
-    		and a.barcode = b.barcode 
+<mapper
+	namespace="com.rzsd.wechat.common.mapper.TShopInvoiceMapper">
+	<select id="select" parameterType="tShopInvoice"
+		resultType="tShopInvoice">
+		select *
+		from t_shop_invoice
 		where
-  			a.shop_id = #{shopId}
-  			and a.type = '2' 
-  			<if test="dateFrom != null">
-  			and a.create_time <![CDATA[>=]]> #{dateFrom}
-  			</if>
-  			<if test="dateTo != null">
-  			and a.create_time <![CDATA[<=]]> #{dateTo}
-  			</if>
+		1=1
+		<if test="shopInvoiceId != null">and shop_invoice_id = #{shopInvoiceId}</if>
+		<if test="shopId != null">and shop_id = #{shopId}</if>
+		<if test="barcode != null">and barcode = #{barcode}</if>
+		<if test="count != null">and count = #{count}</if>
+		<if test="type != null">and type = #{type}</if>
+		<if test="reason != null">and reason = #{reason}</if>
+		<if test="delFlg != null">and del_flg = #{delFlg}</if>
+		<if test="createTime != null">and create_time = #{createTime}</if>
+		<if test="createId != null">and create_id = #{createId}</if>
+		<if test="updateTime != null">and update_time = #{updateTime}</if>
+		<if test="updateId != null">and update_id = #{updateId}</if>
+		<if test="orderByStr != null">ORDER BY ${orderByStr}</if>
+		<if test="limitCnt != null">
+			limit ${limitCnt}
+			<if test="offsetRowNum != null">offset ${offsetRowNum}</if>
+		</if>
+	</select>
+
+	<select id="selectShopInvoiceSum" parameterType="tShopSum"
+		resultType="tShopSum">
+		select
+		a.barcode
+		, b.item_name
+		, b.price_rmb
+		, b.price_show
+		, sum(a.count) as sum_cnt
+		from t_shop_invoice a
+		left join m_shop_item b
+		on a.shop_id = b.shop_id
+		and a.barcode = b.barcode
+		where
+		a.shop_id = #{shopId}
+		and a.type = '2'
+		and a.del_flg = '0'
+		<if test="dateFrom != null">
+			and a.create_time <![CDATA[>=]]>
+			#{dateFrom}
+		</if>
+		<if test="dateTo != null">
+			and a.create_time <![CDATA[<=]]>
+			#{dateTo}
+		</if>
 		group by a.barcode, b.item_name, b.price_rmb, b.price_show
-    </select>
-    
-    <insert id="insert" parameterType="tShopInvoice">
-        INSERT
-        INTO t_shop_invoice(
-        shop_id
-        <if test="barcode != null">, barcode</if>
-        <if test="count != null">, count</if>
-        <if test="type != null">, type</if>
-        <if test="reason != null">, reason</if>
-        <if test="delFlg != null">, del_flg</if>
-        <if test="createTime != null">, create_time</if>
-        <if test="createId != null">, create_id</if>
-        <if test="updateTime != null">, update_time</if>
-        <if test="updateId != null">, update_id</if>
-        )
-        VALUES (
-        #{shopId}
-        <if test="barcode != null">, #{barcode}</if>
-        <if test="count != null">, #{count}</if>
-        <if test="type != null">, #{type}</if>
-        <if test="reason != null">, #{reason}</if>
-        <if test="delFlg != null">, #{delFlg}</if>
-        <if test="createTime != null">, #{createTime}</if>
-        <if test="createId != null">, #{createId}</if>
-        <if test="updateTime != null">, #{updateTime}</if>
-        <if test="updateId != null">, #{updateId}</if>
-        )
-    </insert>
+	</select>
+
+	<insert id="insert" parameterType="tShopInvoice">
+		INSERT
+		INTO t_shop_invoice(
+		shop_id
+		<if test="barcode != null">, barcode</if>
+		<if test="count != null">, count</if>
+		<if test="type != null">, type</if>
+		<if test="reason != null">, reason</if>
+		<if test="delFlg != null">, del_flg</if>
+		<if test="createTime != null">, create_time</if>
+		<if test="createId != null">, create_id</if>
+		<if test="updateTime != null">, update_time</if>
+		<if test="updateId != null">, update_id</if>
+		)
+		VALUES (
+		#{shopId}
+		<if test="barcode != null">, #{barcode}</if>
+		<if test="count != null">, #{count}</if>
+		<if test="type != null">, #{type}</if>
+		<if test="reason != null">, #{reason}</if>
+		<if test="delFlg != null">, #{delFlg}</if>
+		<if test="createTime != null">, #{createTime}</if>
+		<if test="createId != null">, #{createId}</if>
+		<if test="updateTime != null">, #{updateTime}</if>
+		<if test="updateId != null">, #{updateId}</if>
+		)
+	</insert>
+
+	<update id="update" parameterType="tShopInvoice">
+		UPDATE t_shop_invoice
+		SET
+		shop_invoice_id = #{shopInvoiceId}
+		, shop_id = #{shopId}
+		, barcode = #{barcode}
+		, count = #{count}
+		, type = #{type}
+		, reason = #{reason}
+		, del_flg = #{delFlg}
+		, create_time = #{createTime}
+		, create_id = #{createId}
+		, update_time = #{updateTime}
+		, update_id = #{updateId}
+		WHERE
+		1=1
+		<if test="shopInvoiceId != null">and shop_invoice_id = #{shopInvoiceId}</if>
+	</update>
+
 </mapper>

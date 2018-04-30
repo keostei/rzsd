@@ -371,3 +371,7 @@ td {
     border-left-style:dashed;
     border-width:1px;
 }
+
+.dn{
+	display:none;
+}

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rzsd.wechat.common.mapper.MShopItemMapper">
+	<select id="select" parameterType="mShopItem"
+		resultType="mShopItem">
+		select *
+		from m_shop_item
+		where
+		1=1
+		<if test="shopId != null">and shop_id = #{shopId}</if>
+		<if test="barcode != null">and barcode = #{barcode}</if>
+		<if test="itemName != null">and item_name = #{itemName}</if>
+		<if test="priceShow != null">and price_show = #{priceShow}</if>
+		<if test="priceRmb != null">and price_rmb = #{priceRmb}</if>
+		<if test="weight != null">and weight = #{weight}</if>
+		<if test="deliveryPrice != null">and delivery_price = #{deliveryPrice}</if>
+		<if test="imgPath != null">and img_path = #{imgPath}</if>
+		<if test="delFlg != null">and del_flg = #{delFlg}</if>
+		<if test="createTime != null">and create_time = #{createTime}</if>
+		<if test="createId != null">and create_id = #{createId}</if>
+		<if test="updateTime != null">and update_time = #{updateTime}</if>
+		<if test="updateId != null">and update_id = #{updateId}</if>
+		<if test="orderByStr != null">ORDER BY ${orderByStr}</if>
+		<if test="limitCnt != null">
+			limit ${limitCnt}
+			<if test="offsetRowNum != null">offset ${offsetRowNum}</if>
+		</if>
+	</select>
+
+	<insert id="insert" parameterType="mShopItem">
+		INSERT
+		INTO m_shop_item(
+		shop_id
+		<if test="barcode != null">, barcode</if>
+		<if test="itemName != null">, item_name</if>
+		<if test="priceShow != null">, price_show</if>
+		<if test="priceRmb != null">, price_rmb</if>
+		<if test="weight != null">, weight</if>
+		<if test="deliveryPrice != null">, delivery_price</if>
+		<if test="imgPath != null">, img_path</if>
+		<if test="delFlg != null">, del_flg</if>
+		<if test="createTime != null">, create_time</if>
+		<if test="createId != null">, create_id</if>
+		<if test="updateTime != null">, update_time</if>
+		<if test="updateId != null">, update_id</if>
+		)
+		VALUES (
+		#{shopId}
+		<if test="barcode != null">, #{barcode}</if>
+		<if test="itemName != null">, #{itemName}</if>
+		<if test="priceShow != null">, #{priceShow}</if>
+		<if test="priceRmb != null">, #{priceRmb}</if>
+		<if test="weight != null">, #{weight}</if>
+		<if test="deliveryPrice != null">, #{deliveryPrice}</if>
+		<if test="imgPath != null">, #{imgPath}</if>
+		<if test="delFlg != null">, #{delFlg}</if>
+		<if test="createTime != null">, #{createTime}</if>
+		<if test="createId != null">, #{createId}</if>
+		<if test="updateTime != null">, #{updateTime}</if>
+		<if test="updateId != null">, #{updateId}</if>
+		)
+	</insert>
+
+	<update id="update" parameterType="mShopItem">
+		UPDATE m_shop_item
+		SET
+		shop_id = #{shopId}
+		,barcode = #{barcode}
+		,item_name = #{itemName}
+		,price_show = #{priceShow}
+		,price_rmb = #{priceRmb}
+		,weight = #{weight}
+		,delivery_price = #{deliveryPrice}
+		,img_path = #{imgPath}
+		,del_flg = #{delFlg}
+		,create_time = #{createTime}
+		,create_id = #{createId}
+		,update_time = #{updateTime}
+		,update_id = #{updateId}
+		WHERE
+		1=1
+		<if test="shopId != null">and shop_id = #{shopId}</if>
+		<if test="barcode != null">and barcode = #{barcode}</if>
+	</update>
+</mapper>
