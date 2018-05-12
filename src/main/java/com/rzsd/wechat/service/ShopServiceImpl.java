@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.rzsd.wechat.common.constrant.RzConst;
 import com.rzsd.wechat.common.dto.MShopItem;
@@ -24,6 +25,7 @@ import com.rzsd.wechat.util.DateUtil;
 public class ShopServiceImpl implements ShopService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ShopServiceImpl.class.getName());
+    private static final String IMG_BASE_URL = "http://104.199.178.242/xmshop/";
     @Autowired
     private TShopInvoiceMapper tShopInvoiceMapper;
     @Autowired
@@ -76,7 +78,33 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     public List<TShopItem> selectShopItemWithItemInfo(TShopItem tShopItemCond) {
-        return tShopItemMapper.selectShopItemWithItemInfo(tShopItemCond);
+        List<TShopItem> resLst = tShopItemMapper.selectShopItemWithItemInfo(tShopItemCond);
+        for (TShopItem tsm : resLst) {
+            if (!StringUtils.isEmpty(tsm.getImgPath())) {
+                tsm.setImgPath(IMG_BASE_URL + tsm.getImgPath());
+            } else {
+                // tsm.setImgPath(IMG_BASE_URL + "4954540109784.jpg");
+                tsm.setImgPath("/img/noimage.gif");
+            }
+
+            // 价格
+            if (tsm.getTotalAmount().compareTo(BigInteger.ZERO) > 0) {
+                tsm.setPriceShow("现货");
+            } else {
+                tsm.setPriceShow("无货");
+            }
+            if (tsm.getPrice() != null && tsm.getPrice().compareTo(BigDecimal.ZERO) > 0) {
+                tsm.setPriceShow(tsm.getPriceShow() + tsm.getPrice() + "元");
+            }
+            // 弹框图片介绍
+            if (!StringUtils.isEmpty(tsm.getDetail())) {
+                tsm.setTitleShow(tsm.getPriceShow() + "，" + tsm.getDetail());
+            } else {
+                tsm.setTitleShow(tsm.getPriceShow() + "，" + tsm.getItemName());
+            }
+
+        }
+        return resLst;
     }
 
     @Override

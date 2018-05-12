@@ -27,7 +27,9 @@
             t.total_amount,
             t.update_time,
             CASE WHEN m.item_name IS NULL THEN '商品名未设置' ELSE m.item_name END AS item_name ,
-            m.img_path 
+            m.img_path,
+            m.detail,
+            m.price_show as price 
         FROM
             t_shop_item t 
             LEFT JOIN m_shop_item m 
@@ -41,6 +43,9 @@
             OR m.item_name LIKE concat(concat('%',#{itemName}),'%'))
             </if>
         ORDER BY t.update_time DESC, t.barcode
+        <if test="limitCnt != null">
+            limit ${limitCnt}
+        </if>
     </select>
     
     <insert id="insert" parameterType="tShopItem">

@@ -236,4 +236,20 @@ public class WebController {
         model.addAttribute("totalPriceShow", totalPriceShow);
         return "item_sum";
     }
+
+    @RequestMapping(value = "shop/xm")
+    public String pubShopItemList(@RequestParam(name = "shopId", required = false) String shopId,
+            @RequestParam(name = "itemName", required = false) String itemName, Model model,
+            HttpServletRequest request) {
+        shopId = "2";
+        TShopItem tShopItemCond = new TShopItem();
+        tShopItemCond.setShopId(new BigInteger(shopId));
+        if (!StringUtils.isEmpty(itemName)) {
+            tShopItemCond.setItemName(itemName);
+        }
+        tShopItemCond.setLimitCnt(30L);
+        model.addAttribute("shopItemLst", shopServiceImpl.selectShopItemWithItemInfo(tShopItemCond));
+        model.addAttribute("itemName", itemName);
+        return "xmshop_list";
+    }
 }
