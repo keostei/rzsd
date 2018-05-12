@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+    <head>
+        <title>XM日韩美代购</title>
+        <!-- Meta tag Keywords -->
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="keywords" content="XM日韩美代购" />
+        <script type="application/x-javascript">
+            addEventListener("load", function() {
+            	setTimeout(hideURLbar, 0); 
+            	}, false);
+            function hideURLbar(){ window.scrollTo(0,1); }
+        </script>
+        <link rel="stylesheet" href="/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="/css/style.css" type="text/css" media="all" /> 
+        <link rel="stylesheet" href="/css/font-awesome.css" />
+        <link rel="stylesheet" href="/css/simplelightbox.min.css" />
+  
+    </head>
+    <body> 
+        <div id="home">
+        </div>	
+        <!-- //banner --> 
+        <!-- header -->
+        <div class="header-w3layouts"> 
+    	    <!-- Navigation -->
+	        <nav class="navbar navbar-default">
+	        </nav>  
+        </div>	
+        <!-- //header -->
+        <!-- Modal -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog">
+			<div class="modal-dialog">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+							<img src="images/3.jpg" alt=" " class="img-responsive" />
+							<h5>Donec lobortis pharetra dolor</h5>
+							<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, rds which don't look even slightly believable..</p>
+					</div>
+				</div>
+				<!-- //Modal content -->
+			</div>
+		</div>
+		<!-- //Modal -->
+		<!-- gallery -->
+		<div id="gallery" class="gallery">  
+			<div class="container"> 
+				<h3 class="w3l-title">XM日韩美代购</h3>
+			</div>
+			<div class="row" style="margin-left:0px;">
+			<form method="post">
+			    <div class="col-xs-10" style="padding-right:0px;">
+			        <input type="search" name="itemName" th:value="${itemName}" placeholder="请输入商品名检索"
+			            style="height:40px;width: 100%;font-size: 18px;
+			            background-color: rgba(218, 227, 232,.95);border: 1px solid #dae3e8;" />
+			    </div>
+			    <div class="col-xs-2" style="padding-left:0px;">
+			        <input type="submit" value=""
+			            style="background:url(/img/searchbt.png) center no-repeat;
+			            background-size:100%;height:40px;width:40px;
+			            border-style:none;"/>
+			    </div>
+			    <div class="clear:both"></div>
+			</form>
+			</div>
+			<div class="agileinfo-gallery-row">
+				<div th:each="shopItem,iterStat:${shopItemLst}" class="col-md-3 col-sm-3 col-xs-6 w3gallery-grids">
+					<a th:href="${shopItem.imgPath}" class="imghvr-hinge-right figure">
+						<img th:src="${shopItem.imgPath}" class="lazy" th:classappend="${shopItem.totalAmount==0}?'gray':''" alt="" th:title="${shopItem.titleShow}"/> 
+						<div class="agile-figcaption">
+						  <h4 th:text="${shopItem.itemName}" />
+						  <p th:text="${shopItem.priceShow}" />
+						</div>
+						<div class="sl-caption1" th:text="${shopItem.itemName + shopItem.priceShow}"></div>
+					</a> 
+				</div> 
+				<div class="clearfix"> </div>
+			</div>
+		</div>
+		<!-- //gallery -->
+		<!-- //contact -->
+		<!-- footer -->
+		<div class="footer">
+			<div class="container">
+				<div class="footer-top">
+					<div class="col-md-4 amet-sed amet-medium">
+						<div class="ag-w3-3">
+							<a href="#home" class="scroll"> 回到顶端</a>
+						</div>
+						<div class="clearfix"> </div>
+					</div>
+					<div class="clearfix"> </div>
+				</div>
+			</div>
+		</div>
+		<!-- copy right -->
+		<p class="footer-class">© 2018 Xm Melissa. All Rights Reserved</p>
+		<p class="footer-class" style="color:#201f1f;">Design by W3layouts</p>
+		<!-- //copy right -->
+		<!-- //footer --> 
+
+		<!-- js-scripts -->			
+		<!-- js -->
+		<script type="text/javascript" src="/js/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="/js/bootstrap.min.js"></script> 
+		<script type="text/javascript" src="/js/jquery.lazyload.min.js" />
+		<!-- //js -->
+		<!-- Flexslider-js for-testimonials -->
+		<script type="text/javascript">
+		$("img.lazy").lazyload({event : "sporty"});
+		$(window).bind("load", function() { 
+		    var timeout = setTimeout(function() { $("img.lazy").trigger("sporty") }, 2000);
+		}); 
+		$(window).load(function() {
+		$("#flexiselDemo1").flexisel({
+			visibleItems:1,
+			animationSpeed: 1000,
+			autoPlay:false,
+			autoPlaySpeed: 3000,    		
+			pauseOnHover: true,
+			enableResponsiveBreakpoints: true,
+			responsiveBreakpoints: { 
+				portrait: { 
+					changePoint:480,
+					visibleItems: 1
+				}, 
+				landscape: { 
+					changePoint:640,
+					visibleItems:1
+				},
+				tablet: { 
+					changePoint:768,
+					visibleItems: 1
+				}
+			}
+		});
+	
+		});
+		</script>
+		<script type="text/javascript" src="/js/jquery.flexisel.js"></script>
+		<!-- //Flexslider-js for-testimonials -->
+		<!-- Gallery -->
+		<script type="text/javascript" src="/js/simple-lightbox.min.js"></script>
+		<script>
+			$(function(){
+				var gallery = $('.agileinfo-gallery-row a').simpleLightbox({navText:		['&lsaquo;','&rsaquo;']});
+			});
+		</script> 
+		<!-- //Gallery -->
+		<!-- start-smoth-scrolling -->
+		<!-- <script type="text/javascript" src="js/move-top.js"></script> -->
+		<script type="text/javascript" src="/js/easing.js"></script>
+		<script type="text/javascript">
+			jQuery(document).ready(function($) {
+				$(".scroll").click(function(event){		
+					event.preventDefault();
+					$('html,body').animate({scrollTop:$(this.hash).offset().top},1000);
+				});
+			});
+		</script>
+		<!-- start-smoth-scrolling -->
+		<!-- smooth scrolling -->
+		<script src="/js/SmoothScroll.min.js"></script>
+		<!-- //smooth scrolling -->
+		<!-- search-jQuery -->
+		<!-- <script src="js/main.js"></script> -->
+		<!-- //search-jQuery -->
+	
+	<!-- //js-scripts -->
+	</body>
+</html>
