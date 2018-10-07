@@ -480,7 +480,7 @@ public class RestFullController {
             if (StringUtils.isEmpty(bci.getResult())) {
                 continue;
             }
-            if (!"EAN13".equals(bci.getType())) {
+            if (!("EAN13".equals(bci.getType()) || "EAN8".equals(bci.getType()))) {
                 continue;
             }
             t = new TShopInvoice();
